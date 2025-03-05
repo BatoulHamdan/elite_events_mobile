@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'dart:developer';
 import 'package:elite_events_mobile/app_drawer.dart';
 import 'package:elite_events_mobile/navbar.dart';
-import 'package:elite_events_mobile/Screens/User_Screens/profile_screen.dart';
+import 'package:elite_events_mobile/Screens/home_screen.dart';
 import 'package:elite_events_mobile/Services/auth_service.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -41,24 +41,26 @@ class LoginScreenState extends State<LoginScreen> {
 
       if (!mounted) return;
 
-      if (response['status'] == "success") {
+      if (response['success'] == true) {
         log("Login successful, navigating to HomeScreen...");
 
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => const ProfileScreen()),
+          MaterialPageRoute(builder: (context) => const HomeScreen()),
         );
       } else {
-        log("Login failed: ${response['message'] ?? 'Unknown error'}");
+        log("Login failed: ${response['error'] ?? 'Unknown error'}");
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(response['message'] ?? 'Login failed')),
+          SnackBar(content: Text(response['error'] ?? 'Login failed')),
         );
       }
     } catch (e) {
       log("Error during login: $e");
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('Error: $e')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Something went wrong. Please try again.'),
+        ),
+      );
     } finally {
       if (mounted) {
         setState(() {

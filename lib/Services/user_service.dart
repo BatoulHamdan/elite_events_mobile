@@ -1,20 +1,22 @@
 import 'dart:convert';
+import 'package:elite_events_mobile/Models/user_model.dart';
 import 'package:http/http.dart' as http;
 
 class UserService {
   static const String baseUrl = "http://10.0.2.2:5000";
 
-  static Future<dynamic> fetchData(String endpoint) async {
+  static Future<User> fetchUserById(String userId) async {
     try {
-      final response = await http.get(Uri.parse("$baseUrl/api/user/$endpoint"));
+      final response = await http.get(Uri.parse("$baseUrl/api/user/$userId"));
 
       if (response.statusCode == 200) {
-        return json.decode(response.body);
+        final jsonData = json.decode(response.body);
+        return User.fromJson(jsonData);
       } else {
-        throw Exception("Failed to load data: ${response.statusCode}");
+        throw Exception("Failed to load user: ${response.statusCode}");
       }
     } catch (e) {
-      throw Exception("Error fetching data: $e");
+      throw Exception("Error fetching user: $e");
     }
   }
 

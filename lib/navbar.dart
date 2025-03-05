@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:elite_events_mobile/Screens/User_Screens/login_screen.dart';
 import 'package:elite_events_mobile/Screens/User_Screens/register_screen.dart';
-import 'package:elite_events_mobile/Services/auth_service.dart'; // Import your auth service
+import 'package:elite_events_mobile/Services/auth_service.dart';
 
 class Navbar extends StatelessWidget implements PreferredSizeWidget {
   @override

@@ -1,4 +1,3 @@
-import 'package:elite_events_mobile/Screens/User_Screens/profile_screen.dart';
 import 'package:elite_events_mobile/Services/auth_service.dart';
 import 'package:flutter/material.dart';
 import 'package:elite_events_mobile/Screens/home_screen.dart';
@@ -35,6 +34,6 @@ class MainScreenState extends State<MainScreen> {
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
 
-    return _isLoggedIn ? const ProfileScreen() : const LoginScreen();
+    return _isLoggedIn ? const HomeScreen() : const LoginScreen();
   }
 }

@@ -6,6 +6,11 @@ import 'package:shared_preferences/shared_preferences.dart';
 class AuthService {
   final String baseUrl = "http://10.0.2.2:5000";
 
+  Future<String?> getUserId() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    return prefs.getString("userId");
+  }
+
   Future<Map<String, dynamic>> registerUser(
     String firstName,
     String lastName,
@@ -30,15 +35,26 @@ class AuthService {
           )
           .timeout(const Duration(seconds: 10));
 
+      log("Register API Response: ${response.body}");
+
       if (response.statusCode == 200) {
         final Map<String, dynamic> data = jsonDecode(response.body);
-        return {
-          "success": true,
-          "message": data['message'] ?? 'Registration successful',
-        };
+
+        if (data.containsKey("userId")) {
+          final prefs = await SharedPreferences.getInstance();
+          await prefs.setString("userId", data["userId"]);
+
+          return {
+            "success": true,
+            "message": data["message"] ?? "Registration successful",
+            "userId": data["userId"],
+          };
+        } else {
+          return {"error": "Invalid response from server"};
+        }
       } else {
         final Map<String, dynamic> errorData = jsonDecode(response.body);
-        return {"error": errorData['message'] ?? 'Registration failed'};
+        return {"error": errorData["message"] ?? "Registration failed"};
       }
     } catch (e) {
       log("Error in registerUser: $e");
@@ -48,57 +64,49 @@ class AuthService {
 
   Future<Map<String, dynamic>> loginUser(String email, String password) async {
     try {
-      final url = Uri.parse('$baseUrl/api/user/login');
+      final url = Uri.parse("$baseUrl/api/user/login");
 
-      final response = await http.post(
-        url,
-        headers: {"Content-Type": "application/json"},
-        body: jsonEncode({"email": email, "password": password}),
-      );
+      final response = await http
+          .post(
+            url,
+            headers: {"Content-Type": "application/json"},
+            body: jsonEncode({
+              "email": email.toLowerCase(),
+              "password": password,
+            }),
+          )
+          .timeout(const Duration(seconds: 10));
+
+      log("Login API Response: ${response.body}");
 
       if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
+        final Map<String, dynamic> data = jsonDecode(response.body);
 
-        // Extract sessionId from the cookie header
-        final sessionId = response.headers['set-cookie']
-            ?.split(';')
-            .firstWhere(
-              (cookie) => cookie.startsWith("sessionId="),
-              orElse: () => "",
-            )
-            .replaceFirst("sessionId=", "");
+        if (data.containsKey("userId")) {
+          final prefs = await SharedPreferences.getInstance();
+          await prefs.setString("userId", data["userId"]);
 
-        if (sessionId != null && sessionId.isNotEmpty) {
-          SharedPreferences prefs = await SharedPreferences.getInstance();
-          await prefs.setString("sessionId", sessionId);
-          // Save userId in SharedPreferences
-          await prefs.setString("userId", data["userId"].toString());
+          return {
+            "success": true,
+            "message": data["message"] ?? "Login successful",
+            "userId": data["userId"],
+          };
+        } else {
+          return {"error": "Invalid response from server"};
         }
-
-        return {
-          "status": "success",
-          "message": data["message"],
-          "userId": data["userId"],
-        };
       } else {
-        final errorData = jsonDecode(response.body);
-        return {
-          "status": "error",
-          "message": errorData["message"] ?? "Login failed!",
-        };
+        final Map<String, dynamic> errorData = jsonDecode(response.body);
+        return {"error": errorData["message"] ?? "Login failed"};
       }
     } catch (e) {
       log("Error in loginUser: $e");
-      return {
-        "status": "error",
-        "message": "An error occurred. Please try again later.",
-      };
+      return {"error": "Could not log in. Please try again later."};
     }
   }
 
   Future<bool> isLoggedIn() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    return prefs.containsKey("sessionId");
+    return prefs.containsKey("userId");
   }
 
   Future<void> logoutUser() async {
@@ -117,6 +125,7 @@ class AuthService {
 
       if (response.statusCode == 200) {
         await prefs.remove("sessionId");
+        await prefs.remove("userId");
         log("User logged out successfully!");
       } else {
         log("Logout failed: ${response.body}");
