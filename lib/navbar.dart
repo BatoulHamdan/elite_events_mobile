@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:elite_events_mobile/Screens/User_Screens/profile_screen.dart';
 import 'package:elite_events_mobile/Screens/User_Screens/login_screen.dart';
 import 'package:elite_events_mobile/Screens/User_Screens/register_screen.dart';
+import 'package:elite_events_mobile/Screens/Event_Screens/events_screen.dart';
 import 'package:elite_events_mobile/Services/User_Services/auth_service.dart';
 
 class Navbar extends StatefulWidget implements PreferredSizeWidget {
@@ -49,6 +50,13 @@ class NavbarState extends State<Navbar> {
           MaterialPageRoute(builder: (context) => const ProfileScreen()),
         );
         break;
+      case 'My Events':
+        if (!mounted) return;
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const EventsScreen()),
+        );
+        break;
     }
   }
 
@@ -83,6 +91,10 @@ class NavbarState extends State<Navbar> {
                     const PopupMenuItem<String>(
                       value: 'Profile',
                       child: Text('Profile'),
+                    ),
+                    const PopupMenuItem<String>(
+                      value: 'My Events',
+                      child: Text('My Events'),
                     ),
                     const PopupMenuItem<String>(
                       value: 'Logout',

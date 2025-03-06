@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:elite_events_mobile/app_drawer.dart';
+import 'package:elite_events_mobile/navbar.dart';
 import 'package:elite_events_mobile/Services/User_Services/user_service.dart';
 
 class ProfileScreen extends StatefulWidget {
@@ -72,7 +74,8 @@ class ProfileScreenState extends State<ProfileScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Profile')),
+      appBar: Navbar(),
+      drawer: AppDrawer(),
       body:
           isLoading
               ? const Center(child: CircularProgressIndicator())
