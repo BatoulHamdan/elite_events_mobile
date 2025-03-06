@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:elite_events_mobile/app_drawer.dart';
 import 'package:elite_events_mobile/navbar.dart';
 import 'package:elite_events_mobile/Screens/main_screen.dart';
-import 'package:elite_events_mobile/Services/auth_service.dart';
+import 'package:elite_events_mobile/Services/User_Services/auth_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class RegisterScreen extends StatefulWidget {
@@ -54,7 +54,7 @@ class RegisterScreenState extends State<RegisterScreen> {
     });
 
     try {
-      var response = await authService.registerUser(
+      var response = await authService.register(
         firstName,
         lastName,
         email,
@@ -64,24 +64,31 @@ class RegisterScreenState extends State<RegisterScreen> {
 
       if (!mounted) return;
 
-      if (response.containsKey('token')) {
+      if (response['status'] == 'success') {
         SharedPreferences prefs = await SharedPreferences.getInstance();
-        await prefs.setString('token', response['token']); // Store token
+        String? sessionCookie = prefs.getString('sessionCookie');
 
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(response['message'] ?? 'Registration successful'),
-          ),
-        );
+        if (sessionCookie != null) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(response['message'] ?? 'Registration successful'),
+            ),
+          );
 
-        if (!mounted) return;
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => const MainScreen()),
-        );
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => const MainScreen()),
+          );
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text("Session cookie missing! Login again."),
+            ),
+          );
+        }
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(response['error'] ?? 'Registration failed')),
+          SnackBar(content: Text(response['message'] ?? 'Registration failed')),
         );
       }
     } catch (e) {

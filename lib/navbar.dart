@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:elite_events_mobile/Screens/User_Screens/login_screen.dart';
 import 'package:elite_events_mobile/Screens/User_Screens/register_screen.dart';
-import 'package:elite_events_mobile/Services/auth_service.dart';
+import 'package:elite_events_mobile/Services/User_Services/auth_service.dart';
 
 class Navbar extends StatelessWidget implements PreferredSizeWidget {
   @override
@@ -52,7 +52,7 @@ class Navbar extends StatelessWidget implements PreferredSizeWidget {
                       );
                       break;
                     case 'Logout':
-                      await AuthService().logoutUser();
+                      await AuthService().logout();
                       Navigator.pushReplacement(
                         context,
                         MaterialPageRoute(

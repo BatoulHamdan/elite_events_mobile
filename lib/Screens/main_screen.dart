@@ -1,6 +1,6 @@
-import 'package:elite_events_mobile/Services/auth_service.dart';
 import 'package:flutter/material.dart';
-import 'package:elite_events_mobile/Screens/home_screen.dart';
+import 'package:elite_events_mobile/Screens/userdashboard_screen.dart';
+import 'package:elite_events_mobile/Services/User_Services/auth_service.dart';
 import 'package:elite_events_mobile/Screens/User_Screens/login_screen.dart';
 
 class MainScreen extends StatefulWidget {
@@ -34,6 +34,6 @@ class MainScreenState extends State<MainScreen> {
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
 
-    return _isLoggedIn ? const HomeScreen() : const LoginScreen();
+    return _isLoggedIn ? UserDashboard() : const LoginScreen();
   }
 }
