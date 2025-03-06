@@ -69,6 +69,7 @@ class RegisterScreenState extends State<RegisterScreen> {
         String? sessionCookie = prefs.getString('sessionCookie');
 
         if (sessionCookie != null) {
+          if (!mounted) return;
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(response['message'] ?? 'Registration successful'),
@@ -80,6 +81,7 @@ class RegisterScreenState extends State<RegisterScreen> {
             MaterialPageRoute(builder: (context) => const MainScreen()),
           );
         } else {
+          if (!mounted) return;
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
               content: Text("Session cookie missing! Login again."),

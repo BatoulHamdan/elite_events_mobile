@@ -5,10 +5,10 @@ class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
 
   @override
-  _ProfileScreenState createState() => _ProfileScreenState();
+  ProfileScreenState createState() => ProfileScreenState();
 }
 
-class _ProfileScreenState extends State<ProfileScreen> {
+class ProfileScreenState extends State<ProfileScreen> {
   final UserService userService = UserService();
   Map<String, dynamic>? userData;
   bool isLoading = true;
@@ -26,7 +26,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   Future<void> loadUserProfile() async {
     final response = await userService.fetchUserDashboard();
+
     if (!mounted) return;
+
     if (response.containsKey('error')) {
       setState(() {
         errorMessage = response['error'];
@@ -51,6 +53,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
     };
 
     final response = await userService.updateUserProfile(updatedUser);
+
+    if (!mounted) return;
 
     if (response['status'] == 'success') {
       ScaffoldMessenger.of(

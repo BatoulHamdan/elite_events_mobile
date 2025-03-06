@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:elite_events_mobile/Screens/userdashboard_screen.dart';
+import 'package:elite_events_mobile/Screens/user_dashboard_screen.dart';
 import 'package:elite_events_mobile/Services/User_Services/auth_service.dart';
 import 'package:elite_events_mobile/Screens/User_Screens/login_screen.dart';
 

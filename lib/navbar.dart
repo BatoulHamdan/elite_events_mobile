@@ -1,15 +1,56 @@
-import 'package:elite_events_mobile/Screens/User_Screens/profile_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:elite_events_mobile/Screens/User_Screens/profile_screen.dart';
 import 'package:elite_events_mobile/Screens/User_Screens/login_screen.dart';
 import 'package:elite_events_mobile/Screens/User_Screens/register_screen.dart';
 import 'package:elite_events_mobile/Services/User_Services/auth_service.dart';
 
-class Navbar extends StatelessWidget implements PreferredSizeWidget {
+class Navbar extends StatefulWidget implements PreferredSizeWidget {
   @override
   final Size preferredSize;
 
   const Navbar({super.key})
     : preferredSize = const Size.fromHeight(kToolbarHeight);
+
+  @override
+  NavbarState createState() => NavbarState();
+}
+
+class NavbarState extends State<Navbar> {
+  Future<void> _handleMenuSelection(String result) async {
+    if (!mounted) return;
+
+    switch (result) {
+      case 'Login':
+        if (!mounted) return;
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const LoginScreen()),
+        );
+        break;
+      case 'Register':
+        if (!mounted) return;
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const RegisterScreen()),
+        );
+        break;
+      case 'Logout':
+        await AuthService().logout();
+        if (!mounted) return;
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const LoginScreen()),
+        );
+        break;
+      case 'Profile':
+        if (!mounted) return;
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const ProfileScreen()),
+        );
+        break;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -34,42 +75,8 @@ class Navbar extends StatelessWidget implements PreferredSizeWidget {
               return const Icon(Icons.error);
             } else if (snapshot.hasData && snapshot.data == true) {
               return PopupMenuButton<String>(
-                onSelected: (String result) async {
-                  switch (result) {
-                    case 'Login':
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const LoginScreen(),
-                        ),
-                      );
-                      break;
-                    case 'Register':
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const RegisterScreen(),
-                        ),
-                      );
-                      break;
-                    case 'Logout':
-                      await AuthService().logout();
-                      Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const LoginScreen(),
-                        ),
-                      );
-                      break;
-                    case 'Profile':
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const ProfileScreen(),
-                        ),
-                      );
-                      break;
-                  }
+                onSelected: (String result) {
+                  _handleMenuSelection(result);
                 },
                 itemBuilder: (BuildContext context) {
                   return [
@@ -85,27 +92,9 @@ class Navbar extends StatelessWidget implements PreferredSizeWidget {
                 },
               );
             } else {
-              // User is not logged in
               return PopupMenuButton<String>(
                 onSelected: (String result) {
-                  switch (result) {
-                    case 'Login':
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const LoginScreen(),
-                        ),
-                      );
-                      break;
-                    case 'Register':
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const RegisterScreen(),
-                        ),
-                      );
-                      break;
-                  }
+                  _handleMenuSelection(result);
                 },
                 itemBuilder: (BuildContext context) {
                   return [

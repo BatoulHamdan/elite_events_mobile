@@ -7,10 +7,10 @@ class UserDashboard extends StatefulWidget {
   const UserDashboard({super.key});
 
   @override
-  _UserDashboardState createState() => _UserDashboardState();
+  UserDashboardState createState() => UserDashboardState();
 }
 
-class _UserDashboardState extends State<UserDashboard> {
+class UserDashboardState extends State<UserDashboard> {
   final UserService userService = UserService();
   Map<String, dynamic>? userData;
   bool isLoading = true;
