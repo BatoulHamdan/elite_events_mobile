@@ -1,3 +1,4 @@
+import 'package:elite_events_mobile/Screens/User_Screens/profile_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:elite_events_mobile/Screens/User_Screens/login_screen.dart';
 import 'package:elite_events_mobile/Screens/User_Screens/register_screen.dart';
@@ -60,16 +61,21 @@ class Navbar extends StatelessWidget implements PreferredSizeWidget {
                         ),
                       );
                       break;
-                    case 'Settings':
-                      // Navigate to Settings screen
+                    case 'Profile':
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const ProfileScreen(),
+                        ),
+                      );
                       break;
                   }
                 },
                 itemBuilder: (BuildContext context) {
                   return [
                     const PopupMenuItem<String>(
-                      value: 'Settings',
-                      child: Text('Settings'),
+                      value: 'Profile',
+                      child: Text('Profile'),
                     ),
                     const PopupMenuItem<String>(
                       value: 'Logout',

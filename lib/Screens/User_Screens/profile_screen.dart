@@ -1,86 +1,136 @@
-// import 'package:elite_events_mobile/app_drawer.dart';
-// import 'package:elite_events_mobile/navbar.dart';
-// import 'package:flutter/material.dart';
-// import 'dart:developer';
-// import 'package:elite_events_mobile/Services/User_Services/profile_service.dart';
-// import 'package:elite_events_mobile/Models/user_model.dart';
+import 'package:flutter/material.dart';
+import 'package:elite_events_mobile/Services/User_Services/user_service.dart';
 
-// class ProfileScreen extends StatefulWidget {
-//   const ProfileScreen({super.key});
+class ProfileScreen extends StatefulWidget {
+  const ProfileScreen({super.key});
 
-//   @override
-//   _ProfileScreenState createState() => _ProfileScreenState();
-// }
+  @override
+  _ProfileScreenState createState() => _ProfileScreenState();
+}
 
-// class _ProfileScreenState extends State<ProfileScreen> {
-//   User? user;
-//   bool isLoading = true;
-//   String? errorMessage;
+class _ProfileScreenState extends State<ProfileScreen> {
+  final UserService userService = UserService();
+  Map<String, dynamic>? userData;
+  bool isLoading = true;
+  String errorMessage = '';
 
-//   @override
-//   void initState() {
-//     super.initState();
-//     fetchUserProfile(); // Call the fetch method here
-//   }
+  final TextEditingController firstNameController = TextEditingController();
+  final TextEditingController lastNameController = TextEditingController();
+  final TextEditingController emailController = TextEditingController();
 
-//   Future<void> fetchUserProfile() async {
-//     setState(() {
-//       isLoading = true;
-//       errorMessage = null; // Reset error message on retry
-//     });
+  @override
+  void initState() {
+    super.initState();
+    loadUserProfile();
+  }
 
-//     try {
-//       User fetchedUser = await ProfileService.getUserById();
-//       setState(() {
-//         user = fetchedUser;
-//         isLoading = false;
-//       });
-//     } catch (e) {
-//       log("Error fetching profile: $e"); // Log the error for debugging
-//       setState(() {
-//         errorMessage = "Error fetching profile: $e";
-//         isLoading = false;
-//       });
-//     }
-//   }
+  Future<void> loadUserProfile() async {
+    final response = await userService.fetchUserDashboard();
+    if (!mounted) return;
+    if (response.containsKey('error')) {
+      setState(() {
+        errorMessage = response['error'];
+        isLoading = false;
+      });
+    } else {
+      setState(() {
+        userData = response['user'];
+        firstNameController.text = userData?['firstName'] ?? '';
+        lastNameController.text = userData?['lastName'] ?? '';
+        emailController.text = userData?['email'] ?? '';
+        isLoading = false;
+      });
+    }
+  }
 
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//       appBar: Navbar(),
-//       drawer: AppDrawer(),
+  Future<void> updateProfile() async {
+    final updatedUser = {
+      'firstName': firstNameController.text,
+      'lastName': lastNameController.text,
+      'email': emailController.text,
+    };
 
-//       body: Center(
-//         child:
-//             isLoading
-//                 ? CircularProgressIndicator()
-//                 : errorMessage != null
-//                 ? Text(errorMessage!, style: TextStyle(color: Colors.red))
-//                 : Column(
-//                   mainAxisAlignment: MainAxisAlignment.center,
-//                   children: [
-//                     Icon(Icons.account_circle, size: 100, color: Colors.grey),
-//                     SizedBox(height: 10),
-//                     Text(
-//                       "${user!.firstName} ${user!.lastName}",
-//                       style: TextStyle(
-//                         fontSize: 22,
-//                         fontWeight: FontWeight.bold,
-//                       ),
-//                     ),
-//                     SizedBox(height: 5),
-//                     Text(
-//                       "Email: ${user!.email}",
-//                       style: TextStyle(fontSize: 16),
-//                     ),
-//                     SizedBox(height: 20),
-//                     ElevatedButton(
-//                       onPressed: fetchUserProfile, // Refresh on button press
-//                       child: Text("Refresh Profile"),
-//                     ),
-//                   ],
-//                 ),
-//       ),
-//     );
-//   }
-// }
+    final response = await userService.updateUserProfile(updatedUser);
+
+    if (response['status'] == 'success') {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Profile updated successfully!')));
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(response['message'] ?? 'Error updating profile'),
+        ),
+      );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('Profile')),
+      body:
+          isLoading
+              ? const Center(child: CircularProgressIndicator())
+              : errorMessage.isNotEmpty
+              ? Center(
+                child: Text(errorMessage, style: TextStyle(color: Colors.red)),
+              )
+              : Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'First Name:',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    TextField(
+                      controller: firstNameController,
+                      decoration: const InputDecoration(
+                        hintText: 'Enter your first name',
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    Text(
+                      'Last Name:',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    TextField(
+                      controller: lastNameController,
+                      decoration: const InputDecoration(
+                        hintText: 'Enter your last name',
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    Text(
+                      'Email:',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    TextField(
+                      controller: emailController,
+                      decoration: const InputDecoration(
+                        hintText: 'Enter your email address',
+                      ),
+                      keyboardType: TextInputType.emailAddress,
+                    ),
+                    const SizedBox(height: 20),
+                    ElevatedButton(
+                      onPressed: updateProfile,
+                      child: const Text('Update Profile'),
+                    ),
+                  ],
+                ),
+              ),
+    );
+  }
+}

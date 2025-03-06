@@ -18,10 +18,7 @@ class UserService {
 
       final response = await client.get(
         Uri.parse('$baseUrl/api/user/userDashboard'),
-        headers: {
-          'Content-Type': 'application/json',
-          'Cookie': sessionCookie,
-        },
+        headers: {'Content-Type': 'application/json', 'Cookie': sessionCookie},
       );
 
       if (response.statusCode == 200) {
@@ -33,6 +30,33 @@ class UserService {
     } catch (e) {
       log("Dashboard Error: $e");
       return {'error': "An error occurred: $e"};
+    }
+  }
+
+  Future<Map<String, dynamic>> updateUserProfile(
+    Map<String, String> updatedUser,
+  ) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final sessionCookie = prefs.getString('sessionCookie');
+
+      if (sessionCookie == null) {
+        return {'error': "Session expired. Please log in again."};
+      }
+
+      final response = await http.put(
+        Uri.parse('$baseUrl/api/user/profile'),
+        headers: {'Content-Type': 'application/json', 'Cookie': sessionCookie},
+        body: jsonEncode(updatedUser),
+      );
+
+      if (response.statusCode == 200) {
+        return jsonDecode(response.body);
+      } else {
+        return {'error': 'Failed to update profile'};
+      }
+    } catch (e) {
+      return {'error': 'An error occurred: $e'};
     }
   }
 }
