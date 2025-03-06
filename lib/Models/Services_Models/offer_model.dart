@@ -21,8 +21,14 @@ class Offer {
       id: json['_id'] ?? '',
       title: json['title'] ?? '',
       description: json['description'] ?? '',
-      startDate: json['startDate'] ?? '',
-      endDate: json['endDate'] ?? '',
+      startDate:
+          json['startDate'] != null
+              ? DateTime.parse(json['startDate'])
+              : DateTime.now(),
+      endDate:
+          json['endDate'] != null
+              ? DateTime.parse(json['endDate'])
+              : DateTime.now(),
     );
   }
 
@@ -32,8 +38,8 @@ class Offer {
       '_id': id,
       'title': title,
       'description': description,
-      'startDate': startDate,
-      'endDate': endDate,
+      'startDate': startDate.toIso8601String(),
+      'endDate': endDate.toIso8601String(),
     };
   }
 

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:elite_events_mobile/app_drawer.dart';
 import 'package:elite_events_mobile/navbar.dart';
 import 'package:elite_events_mobile/Services/User_Services/user_service.dart';
+import 'package:elite_events_mobile/Services/Services_Services/offers_service.dart';
 
 class UserDashboard extends StatefulWidget {
   const UserDashboard({super.key});
@@ -12,14 +13,18 @@ class UserDashboard extends StatefulWidget {
 
 class UserDashboardState extends State<UserDashboard> {
   final UserService userService = UserService();
+  final OffersService offersService = OffersService();
   Map<String, dynamic>? userData;
   bool isLoading = true;
   String errorMessage = '';
+  List<dynamic> offers = [];
+  String offersErrorMessage = '';
 
   @override
   void initState() {
     super.initState();
     loadUserDashboard();
+    fetchOffers();
   }
 
   Future<void> loadUserDashboard() async {
@@ -34,6 +39,19 @@ class UserDashboardState extends State<UserDashboard> {
       setState(() {
         userData = response['user'];
         isLoading = false;
+      });
+    }
+  }
+
+  Future<void> fetchOffers() async {
+    try {
+      final response = await offersService.getOffers();
+      setState(() {
+        offers = response;
+      });
+    } catch (error) {
+      setState(() {
+        offersErrorMessage = error.toString();
       });
     }
   }
@@ -87,6 +105,50 @@ class UserDashboardState extends State<UserDashboard> {
                               ),
                             ),
                             const SizedBox(height: 10),
+                            offersErrorMessage.isNotEmpty
+                                ? Text(
+                                  offersErrorMessage,
+                                  style: const TextStyle(
+                                    color: Colors.red,
+                                    fontSize: 16,
+                                  ),
+                                  textAlign: TextAlign.center,
+                                )
+                                : offers.isEmpty
+                                ? const Text(
+                                  "No offers available.",
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 18,
+                                  ),
+                                )
+                                : ListView.builder(
+                                  shrinkWrap: true,
+                                  itemCount: offers.length,
+                                  itemBuilder: (context, index) {
+                                    final offer = offers[index];
+                                    return Card(
+                                      color: Colors.redAccent,
+                                      margin: const EdgeInsets.symmetric(
+                                        vertical: 10,
+                                      ),
+                                      child: ListTile(
+                                        title: Text(
+                                          offer.title ?? 'No Title',
+                                          style: const TextStyle(
+                                            color: Colors.white,
+                                          ),
+                                        ),
+                                        subtitle: Text(
+                                          offer.description ?? 'No Description',
+                                          style: const TextStyle(
+                                            color: Colors.white70,
+                                          ),
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                ),
                           ],
                         ),
                   ],

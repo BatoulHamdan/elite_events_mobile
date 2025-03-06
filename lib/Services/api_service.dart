@@ -8,7 +8,7 @@ class ApiService {
     String endpoint,
     T Function(Map<String, dynamic>) fromJson,
   ) async {
-    final url = Uri.parse('$baseUrl/api/services/$endpoint');
+    final url = Uri.parse('$baseUrl/api/user/service/$endpoint');
     final response = await http.get(url);
 
     if (response.statusCode == 200) {
