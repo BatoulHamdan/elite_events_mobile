@@ -65,7 +65,6 @@ class EventsScreenState extends State<EventsScreen> {
                         event['eventName'],
                         style: const TextStyle(fontWeight: FontWeight.bold),
                       ),
-                      subtitle: Text(event['date'] ?? 'No date provided'),
                       trailing: const Icon(Icons.arrow_forward_ios, size: 16),
                       onTap: () {
                         Navigator.push(

@@ -32,7 +32,7 @@ class EventDetailScreenState extends State<EventDetailScreen> {
       });
     } else {
       setState(() {
-        eventDetails = response;
+        eventDetails = response['data']['event'];
         isLoading = false;
       });
     }
@@ -59,7 +59,7 @@ class EventDetailScreenState extends State<EventDetailScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      eventDetails?['title'] ?? 'No Title',
+                      eventDetails?['eventName'] ?? 'No Title',
                       style: const TextStyle(
                         fontSize: 24,
                         fontWeight: FontWeight.bold,
