@@ -220,28 +220,63 @@ class UserDashboardState extends State<UserDashboard> {
                                   itemBuilder: (context, index) {
                                     final offer = offers[index];
                                     return Card(
-                                      color: Colors.redAccent,
+                                      elevation: 5, // Adding shadow to the card
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(
+                                          12,
+                                        ), // Rounded corners
+                                      ),
                                       margin: const EdgeInsets.symmetric(
                                         vertical: 10,
-                                      ),
-                                      child: ListTile(
-                                        title: Text(
-                                          offer.title ?? 'No Title',
-                                          style: const TextStyle(
-                                            color: Colors.white,
+                                        horizontal: 15,
+                                      ), // Margin for spacing
+                                      child: Container(
+                                        decoration: BoxDecoration(
+                                          gradient: LinearGradient(
+                                            colors: [
+                                              Colors.redAccent,
+                                              Colors.deepOrange,
+                                              Colors.red,
+                                            ],
+                                            begin: Alignment.topLeft,
+                                            end: Alignment.bottomRight,
+                                          ),
+                                          borderRadius: BorderRadius.circular(
+                                            12,
                                           ),
                                         ),
-                                        subtitle: Text(
-                                          offer.description ?? 'No Description',
-                                          style: const TextStyle(
-                                            color: Colors.white70,
+                                        child: ListTile(
+                                          contentPadding: const EdgeInsets.all(
+                                            15,
                                           ),
+                                          title: Text(
+                                            offer.title ?? 'No Title',
+                                            style: const TextStyle(
+                                              color: Colors.white,
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 18,
+                                            ),
+                                          ),
+                                          subtitle: Text(
+                                            offer.description ??
+                                                'No Description',
+                                            style: const TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 14,
+                                            ),
+                                          ),
+                                          trailing: Icon(
+                                            Icons.arrow_forward_ios,
+                                            color: Colors.white,
+                                          ),
+                                          onTap: () {
+                                            // Handle onTap if necessary
+                                          },
                                         ),
                                       ),
                                     );
                                   },
                                 ),
-
                             const SizedBox(height: 20),
 
                             // Reviews Section
@@ -306,7 +341,7 @@ class UserDashboardState extends State<UserDashboard> {
                                         subtitle: Text(
                                           review['comment'],
                                           style: const TextStyle(
-                                            color: Colors.white70,
+                                            color: Colors.white,
                                           ),
                                         ),
                                       ),
