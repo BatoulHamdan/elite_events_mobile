@@ -58,17 +58,9 @@ class ProfileScreenState extends State<ProfileScreen> {
 
     if (!mounted) return;
 
-    if (response['status'] == 'success') {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('Profile updated successfully!')));
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(response['message'] ?? 'Error updating profile'),
-        ),
-      );
-    }
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(response['message'] ?? 'Error updating profile')),
+    );
   }
 
   @override
@@ -76,68 +68,100 @@ class ProfileScreenState extends State<ProfileScreen> {
     return Scaffold(
       appBar: Navbar(),
       drawer: AppDrawer(),
-      body:
-          isLoading
-              ? const Center(child: CircularProgressIndicator())
-              : errorMessage.isNotEmpty
-              ? Center(
-                child: Text(errorMessage, style: TextStyle(color: Colors.red)),
-              )
-              : Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'First Name:',
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),
+      body: SizedBox.expand(
+        child: Container(
+          decoration: const BoxDecoration(
+            image: DecorationImage(
+              image: AssetImage("assets/title.jpg"),
+              fit: BoxFit.cover,
+            ),
+          ),
+          child: Center(
+            child: SingleChildScrollView(
+              child: Padding(
+                padding: const EdgeInsets.all(20.0),
+                child: Card(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(15),
+                  ),
+                  elevation: 5,
+                  color: Colors.white,
+                  child: Padding(
+                    padding: const EdgeInsets.all(20.0),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Text(
+                          'Profile',
+                          style: TextStyle(
+                            fontSize: 28,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black,
+                          ),
+                        ),
+                        const SizedBox(height: 20),
+                        TextField(
+                          controller: firstNameController,
+                          decoration: const InputDecoration(
+                            labelText: 'First Name',
+                            prefixIcon: Icon(Icons.person),
+                            border: OutlineInputBorder(),
+                          ),
+                          textInputAction: TextInputAction.next,
+                        ),
+                        const SizedBox(height: 16),
+                        TextField(
+                          controller: lastNameController,
+                          decoration: const InputDecoration(
+                            labelText: 'Last Name',
+                            prefixIcon: Icon(Icons.person),
+                            border: OutlineInputBorder(),
+                          ),
+                          textInputAction: TextInputAction.next,
+                        ),
+                        const SizedBox(height: 16),
+                        TextField(
+                          controller: emailController,
+                          decoration: const InputDecoration(
+                            labelText: 'Email',
+                            prefixIcon: Icon(Icons.email),
+                            border: OutlineInputBorder(),
+                          ),
+                          keyboardType: TextInputType.emailAddress,
+                          textInputAction: TextInputAction.done,
+                        ),
+                        const SizedBox(height: 20),
+                        SizedBox(
+                          width: double.infinity,
+                          child: ElevatedButton(
+                            onPressed: updateProfile,
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.white,
+                              padding: const EdgeInsets.symmetric(vertical: 16),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(5),
+                                side: const BorderSide(color: Colors.black),
+                              ),
+                            ),
+                            child: const Text(
+                              'Update Profile',
+                              style: TextStyle(
+                                color: Colors.black,
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
-                    TextField(
-                      controller: firstNameController,
-                      decoration: const InputDecoration(
-                        hintText: 'Enter your first name',
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    Text(
-                      'Last Name:',
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    TextField(
-                      controller: lastNameController,
-                      decoration: const InputDecoration(
-                        hintText: 'Enter your last name',
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    Text(
-                      'Email:',
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    TextField(
-                      controller: emailController,
-                      decoration: const InputDecoration(
-                        hintText: 'Enter your email address',
-                      ),
-                      keyboardType: TextInputType.emailAddress,
-                    ),
-                    const SizedBox(height: 20),
-                    ElevatedButton(
-                      onPressed: updateProfile,
-                      child: const Text('Update Profile'),
-                    ),
-                  ],
+                  ),
                 ),
               ),
+            ),
+          ),
+        ),
+      ),
     );
   }
 }
