@@ -11,79 +11,114 @@ class EntertainmentScreen extends StatefulWidget {
 }
 
 class EntertainmentScreenState extends State<EntertainmentScreen> {
-  late Future<List<Entertainment>> _entertainmentList;
+  final EntertainmentService entertainmentService = EntertainmentService();
+  List<Entertainment> entertainmentList = [];
+  bool isLoading = true;
+  String errorMessage = '';
 
   @override
   void initState() {
     super.initState();
-    _entertainmentList = EntertainmentService().getEntertainments();
+    _fetchEntertainments();
+  }
+
+  Future<void> _fetchEntertainments() async {
+    setState(() => isLoading = true);
+    try {
+      List<Entertainment> fetchedEntertainment =
+          await entertainmentService.getEntertainments();
+      setState(() {
+        entertainmentList = fetchedEntertainment;
+        isLoading = false;
+      });
+    } catch (error) {
+      setState(() {
+        errorMessage = 'Failed to load entertainment services';
+        isLoading = false;
+      });
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Entertainment Services')),
-      body: FutureBuilder<List<Entertainment>>(
-        future: _entertainmentList,
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
-          } else if (snapshot.hasError) {
-            return Center(child: Text('Error: ${snapshot.error}'));
-          } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            return const Center(child: Text('No entertainment available.'));
-          } else {
-            List<Entertainment> entertainmentList = snapshot.data!;
-
-            return ListView.builder(
-              itemCount: entertainmentList.length,
-              itemBuilder: (context, index) {
-                Entertainment entertainment = entertainmentList[index];
-                return Card(
-                  margin: const EdgeInsets.all(10),
-                  child: ListTile(
-                    contentPadding: const EdgeInsets.all(15),
-                    title: Text(
-                      entertainment.name,
-                      style: const TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    subtitle: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Price: \$${entertainment.price.toStringAsFixed(2)}',
-                        ),
-                      ],
-                    ),
-                    leading:
-                        entertainment.images.isNotEmpty
-                            ? Image.network(
-                              'http://10.0.2.2:5000/api/user/service/images/${entertainment.images[0]}',
-                              fit: BoxFit.cover,
-                              width: 60,
-                              height: 60,
-                            )
-                            : const Icon(Icons.music_note, size: 60),
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder:
-                              (context) => EntertainmentDetailScreen(
-                                entertainment: entertainment,
+      appBar: AppBar(title: const Text('Entertainment')),
+      body: Container(
+        decoration: const BoxDecoration(
+          image: DecorationImage(
+            image: AssetImage("assets/title.jpg"),
+            fit: BoxFit.cover,
+          ),
+        ),
+        child: Center(
+          child:
+              isLoading
+                  ? const CircularProgressIndicator()
+                  : errorMessage.isNotEmpty
+                  ? Text(
+                    errorMessage,
+                    style: const TextStyle(color: Colors.red),
+                  )
+                  : entertainmentList.isEmpty
+                  ? const Text(
+                    "No entertainment services found. Tap '+' to add one!",
+                  )
+                  : RefreshIndicator(
+                    onRefresh: _fetchEntertainments,
+                    child: ListView.builder(
+                      padding: const EdgeInsets.all(16.0),
+                      itemCount: entertainmentList.length,
+                      itemBuilder: (context, index) {
+                        final entertainment = entertainmentList[index];
+                        return Card(
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(15),
+                          ),
+                          elevation: 5,
+                          child: ListTile(
+                            contentPadding: const EdgeInsets.all(15),
+                            title: Text(
+                              entertainment.name,
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
                               ),
-                        ),
-                      );
-                    },
+                            ),
+                            subtitle: Text(
+                              'Price: \$${entertainment.price.toStringAsFixed(2)}',
+                            ),
+                            leading:
+                                entertainment.images.isNotEmpty
+                                    ? ClipRRect(
+                                      borderRadius: BorderRadius.circular(8),
+                                      child: Image.network(
+                                        'http://10.0.2.2:5000/api/user/service/images/${entertainment.images[0]}',
+                                        fit: BoxFit.cover,
+                                        width: 60,
+                                        height: 60,
+                                      ),
+                                    )
+                                    : const Icon(Icons.music_note, size: 60),
+                            trailing: const Icon(
+                              Icons.arrow_forward_ios,
+                              size: 16,
+                            ),
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder:
+                                      (context) => EntertainmentDetailScreen(
+                                        entertainment: entertainment,
+                                      ),
+                                ),
+                              );
+                            },
+                          ),
+                        );
+                      },
+                    ),
                   ),
-                );
-              },
-            );
-          }
-        },
+        ),
       ),
     );
   }

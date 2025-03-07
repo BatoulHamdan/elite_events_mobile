@@ -65,7 +65,7 @@ class UserDashboardState extends State<UserDashboard> {
         child: Container(
           decoration: const BoxDecoration(
             image: DecorationImage(
-              image: AssetImage("assets/background.avif"),
+              image: AssetImage("assets/title.jpg"),
               fit: BoxFit.cover,
             ),
           ),

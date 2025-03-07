@@ -11,80 +11,123 @@ class CateringScreen extends StatefulWidget {
 }
 
 class CateringScreenState extends State<CateringScreen> {
-  late Future<List<Catering>> _cateringList;
+  final CateringService cateringService = CateringService();
+  List<Catering> cateringList = [];
+  bool isLoading = true;
+  String errorMessage = '';
 
   @override
   void initState() {
     super.initState();
-    _cateringList = CateringService().getCaterings();
+    _fetchCaterings();
+  }
+
+  Future<void> _fetchCaterings() async {
+    setState(() => isLoading = true);
+    try {
+      List<Catering> fetchedCatering = await cateringService.getCaterings();
+      setState(() {
+        cateringList = fetchedCatering;
+        isLoading = false;
+      });
+    } catch (error) {
+      setState(() {
+        errorMessage = 'Failed to load catering services';
+        isLoading = false;
+      });
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Catering Services')),
-      body: FutureBuilder<List<Catering>>(
-        future: _cateringList,
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
-          } else if (snapshot.hasError) {
-            return Center(child: Text('Error: ${snapshot.error}'));
-          } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            return const Center(child: Text('No catering services available.'));
-          } else {
-            List<Catering> cateringList = snapshot.data!;
-
-            return ListView.builder(
-              itemCount: cateringList.length,
-              itemBuilder: (context, index) {
-                Catering catering = cateringList[index];
-                return Card(
-                  margin: const EdgeInsets.all(10),
-                  child: ListTile(
-                    contentPadding: const EdgeInsets.all(15),
-                    title: Text(
-                      catering.restaurantName,
-                      style: const TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),
+      appBar: AppBar(title: const Text('Caterings')),
+      body: Container(
+        decoration: const BoxDecoration(
+          image: DecorationImage(
+            image: AssetImage("assets/title.jpg"),
+            fit: BoxFit.cover,
+          ),
+        ),
+        child: Center(
+          child:
+              isLoading
+                  ? const CircularProgressIndicator()
+                  : errorMessage.isNotEmpty
+                  ? Text(
+                    errorMessage,
+                    style: const TextStyle(color: Colors.red),
+                  )
+                  : cateringList.isEmpty
+                  ? const Text(
+                    "No catering services found. Tap '+' to add one!",
+                  )
+                  : RefreshIndicator(
+                    onRefresh: _fetchCaterings,
+                    child: ListView.builder(
+                      padding: const EdgeInsets.all(16.0),
+                      itemCount: cateringList.length,
+                      itemBuilder: (context, index) {
+                        final catering = cateringList[index];
+                        return Card(
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(15),
+                          ),
+                          elevation: 5,
+                          child: ListTile(
+                            contentPadding: const EdgeInsets.all(15),
+                            title: Text(
+                              catering.restaurantName,
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            subtitle: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'Food Menu: ${catering.foodMenu.length} items',
+                                ),
+                                Text(
+                                  'Drink Menu: ${catering.drinkMenu.length} items',
+                                ),
+                                Text(
+                                  'Dessert Menu: ${catering.dessertMenu.length} items',
+                                ),
+                              ],
+                            ),
+                            leading:
+                                catering.images.isNotEmpty
+                                    ? Image.network(
+                                      'http://10.0.2.2:5000/api/user/service/images/${catering.images[0]}',
+                                      fit: BoxFit.cover,
+                                      width: 60,
+                                      height: 60,
+                                    )
+                                    : const Icon(Icons.restaurant, size: 60),
+                            trailing: const Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(Icons.arrow_forward_ios, size: 16),
+                              ],
+                            ),
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder:
+                                      (context) => CateringDetailScreen(
+                                        catering: catering,
+                                      ),
+                                ),
+                              );
+                            },
+                          ),
+                        );
+                      },
                     ),
-                    subtitle: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text('Food Menu: ${catering.foodMenu.length} items'),
-                        Text('Drink Menu: ${catering.drinkMenu.length} items'),
-                        Text(
-                          'Dessert Menu: ${catering.dessertMenu.length} items',
-                        ),
-                      ],
-                    ),
-                    leading:
-                        catering.images.isNotEmpty
-                            ? Image.network(
-                              'http://10.0.2.2:5000/api/user/service/images/${catering.images[0]}',
-                              fit: BoxFit.cover,
-                              width: 60,
-                              height: 60,
-                            )
-                            : const Icon(Icons.restaurant, size: 60),
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder:
-                              (context) =>
-                                  CateringDetailScreen(catering: catering),
-                        ),
-                      );
-                    },
                   ),
-                );
-              },
-            );
-          }
-        },
+        ),
       ),
     );
   }

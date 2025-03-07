@@ -87,4 +87,62 @@ class EventService {
       return {'error': "An error occurred: $e"};
     }
   }
+
+  // Update an existing event
+  Future<Map<String, dynamic>> updateEvent(
+    String eventId,
+    Map<String, dynamic> updatedData,
+  ) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final sessionCookie = prefs.getString('sessionCookie');
+
+      if (sessionCookie == null) {
+        return {'error': "Session expired. Please log in again."};
+      }
+
+      final response = await client.put(
+        Uri.parse('$baseUrl/api/user/event/$eventId'),
+        headers: {'Content-Type': 'application/json', 'Cookie': sessionCookie},
+        body: jsonEncode(updatedData),
+      );
+
+      if (response.statusCode == 200) {
+        return jsonDecode(response.body);
+      } else {
+        final errorData = jsonDecode(response.body);
+        return {'error': errorData['message'] ?? 'Failed to update event'};
+      }
+    } catch (e) {
+      log("Error updating event: $e");
+      return {'error': "An error occurred: $e"};
+    }
+  }
+
+  // Delete an existing event
+  Future<Map<String, dynamic>> deleteEvent(String eventId) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final sessionCookie = prefs.getString('sessionCookie');
+
+      if (sessionCookie == null) {
+        return {'error': "Session expired. Please log in again."};
+      }
+
+      final response = await client.delete(
+        Uri.parse('$baseUrl/api/user/event/$eventId'),
+        headers: {'Content-Type': 'application/json', 'Cookie': sessionCookie},
+      );
+
+      if (response.statusCode == 200) {
+        return {'success': true};
+      } else {
+        final errorData = jsonDecode(response.body);
+        return {'error': errorData['message'] ?? 'Failed to delete event'};
+      }
+    } catch (e) {
+      log("Error deleting event: $e");
+      return {'error': "An error occurred: $e"};
+    }
+  }
 }

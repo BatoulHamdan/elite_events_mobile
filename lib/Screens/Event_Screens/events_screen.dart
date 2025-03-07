@@ -35,51 +35,119 @@ class EventsScreenState extends State<EventsScreen> {
     });
   }
 
+  Future<void> _deleteEvent(String eventId) async {
+    bool confirmDelete = await showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text("Confirm Delete"),
+          content: const Text("Are you sure you want to delete this event?"),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(false),
+              child: const Text("Cancel"),
+            ),
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(true),
+              child: const Text("Delete", style: TextStyle(color: Colors.red)),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (confirmDelete) {
+      final response = await eventService.deleteEvent(eventId);
+      if (response.containsKey('error')) {
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(response['error']),
+            backgroundColor: Colors.red,
+          ),
+        );
+      } else {
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Event deleted successfully")),
+        );
+        _fetchEvents();
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('My Events')),
-      body:
-          isLoading
-              ? const Center(child: CircularProgressIndicator())
-              : errorMessage.isNotEmpty
-              ? Center(
-                child: Text(
-                  errorMessage,
-                  style: const TextStyle(color: Colors.red),
-                ),
-              )
-              : events.isEmpty
-              ? const Center(
-                child: Text("No events found. Tap '+' to add one!"),
-              )
-              : RefreshIndicator(
-                onRefresh: _fetchEvents,
-                child: ListView.separated(
-                  itemCount: events.length,
-                  separatorBuilder: (context, index) => const Divider(),
-                  itemBuilder: (context, index) {
-                    final event = events[index];
-                    return ListTile(
-                      title: Text(
-                        event['eventName'],
-                        style: const TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                      trailing: const Icon(Icons.arrow_forward_ios, size: 16),
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder:
-                                (context) =>
-                                    EventDetailScreen(eventId: event['_id']),
+      appBar: AppBar(title: const Text('Elite Events')),
+      body: Container(
+        decoration: const BoxDecoration(
+          image: DecorationImage(
+            image: AssetImage("assets/title.jpg"),
+            fit: BoxFit.cover,
+          ),
+        ),
+        child: Center(
+          child:
+              isLoading
+                  ? const CircularProgressIndicator()
+                  : errorMessage.isNotEmpty
+                  ? Text(
+                    errorMessage,
+                    style: const TextStyle(color: Colors.red),
+                  )
+                  : events.isEmpty
+                  ? const Text("No events found. Tap '+' to add one!")
+                  : RefreshIndicator(
+                    onRefresh: _fetchEvents,
+                    child: ListView.builder(
+                      padding: const EdgeInsets.all(16.0),
+                      itemCount: events.length,
+                      itemBuilder: (context, index) {
+                        final event = events[index];
+                        return Card(
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(15),
+                          ),
+                          elevation: 5,
+                          child: ListTile(
+                            title: Text(
+                              event['eventName'],
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            trailing: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                IconButton(
+                                  icon: const Icon(
+                                    Icons.delete,
+                                    color: Colors.red,
+                                  ),
+                                  onPressed: () => _deleteEvent(event['_id']),
+                                ),
+                                const Icon(Icons.arrow_forward_ios, size: 16),
+                              ],
+                            ),
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder:
+                                      (context) => EventDetailScreen(
+                                        eventId: event['_id'],
+                                      ),
+                                ),
+                              );
+                            },
                           ),
                         );
                       },
-                    );
-                  },
-                ),
-              ),
+                    ),
+                  ),
+        ),
+      ),
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
           final result = await Navigator.push(
