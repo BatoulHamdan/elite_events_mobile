@@ -7,7 +7,7 @@ class EventService {
   final String baseUrl = 'http://10.0.2.2:5000';
   final http.Client client = http.Client();
 
-  // Fetch the list of events for the logged-in user
+  // Fetch the list of events 
   Future<Map<String, dynamic>> fetchUserEvents() async {
     try {
       final prefs = await SharedPreferences.getInstance();

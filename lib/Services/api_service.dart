@@ -45,4 +45,17 @@ class ApiService {
       throw Exception('Failed to load $endpoint details');
     }
   }
+
+  Future<void> postData(String endpoint, Map<String, dynamic> body) async {
+    final url = Uri.parse('$baseUrl/api/user/service/$endpoint');
+    final response = await http.post(
+      url,
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode(body),
+    );
+
+    if (response.statusCode != 200) {
+      throw Exception('Failed to process request: ${response.body}');
+    }
+  }
 }

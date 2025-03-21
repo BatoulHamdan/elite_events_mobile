@@ -1,3 +1,4 @@
+import 'package:elite_events_mobile/Screens/Event_Screens/add_event_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:elite_events_mobile/app_drawer.dart';
 import 'package:elite_events_mobile/navbar.dart';
@@ -222,14 +223,12 @@ class UserDashboardState extends State<UserDashboard> {
                                     return Card(
                                       elevation: 5, // Adding shadow to the card
                                       shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(
-                                          12,
-                                        ), // Rounded corners
+                                        borderRadius: BorderRadius.circular(12),
                                       ),
                                       margin: const EdgeInsets.symmetric(
                                         vertical: 10,
                                         horizontal: 15,
-                                      ), // Margin for spacing
+                                      ),
                                       child: Container(
                                         decoration: BoxDecoration(
                                           gradient: LinearGradient(
@@ -270,7 +269,14 @@ class UserDashboardState extends State<UserDashboard> {
                                             color: Colors.white,
                                           ),
                                           onTap: () {
-                                            // Handle onTap if necessary
+                                            Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                builder:
+                                                    (context) =>
+                                                        const AddEventScreen(),
+                                              ),
+                                            );
                                           },
                                         ),
                                       ),

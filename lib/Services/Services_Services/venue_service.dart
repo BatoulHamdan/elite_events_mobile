@@ -17,4 +17,14 @@ class VenueService {
       (json) => Venue.fromJson(json),
     );
   }
+
+  // Book a venue
+  Future<void> bookVenue(String venueId) async {
+    await _apiService.postData('venue/book', {'venueId': venueId});
+  }
+
+  // Cancel booking
+  Future<void> cancelBooking(String venueId) async {
+    await _apiService.postData('venue/cancel', {'venueId': venueId});
+  }
 }
