@@ -60,9 +60,11 @@ class CateringSelectionScreenState extends State<CateringSelectionScreen> {
     }
 
     try {
-      await _eventService.updateEvent(widget.eventId, {
-        'catering': catering.id,
-      });
+      final updatedEventData = Map<String, dynamic>.from(eventData!);
+      updatedEventData['catering'] = catering.id;
+
+      await _eventService.updateEvent(widget.eventId, updatedEventData);
+
       setState(() {
         eventData?['catering'] = catering.id;
       });
@@ -76,7 +78,11 @@ class CateringSelectionScreenState extends State<CateringSelectionScreen> {
 
   Future<void> _cancelCatering() async {
     try {
-      await _eventService.updateEvent(widget.eventId, {'catering': null});
+      final updatedEventData = Map<String, dynamic>.from(eventData!);
+      updatedEventData['catering'] = null;
+
+      await _eventService.updateEvent(widget.eventId, updatedEventData);
+
       setState(() {
         eventData!['catering'] = null;
       });

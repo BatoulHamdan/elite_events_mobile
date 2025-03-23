@@ -61,7 +61,9 @@ class VenueSelectionScreenState extends State<VenueSelectionScreen> {
 
     try {
       await _venueService.bookVenue(venue.id.toString(), widget.eventId);
+
       await _eventService.updateEvent(widget.eventId, {'venue': venue.id});
+
       setState(() {
         eventData?['venue'] = venue.id;
       });
@@ -76,7 +78,9 @@ class VenueSelectionScreenState extends State<VenueSelectionScreen> {
   Future<void> _cancelBooking() async {
     try {
       await _venueService.cancelBooking(eventData!['venue'], widget.eventId);
+
       await _eventService.updateEvent(widget.eventId, {'venue': null});
+
       setState(() {
         eventData!['venue'] = null;
       });

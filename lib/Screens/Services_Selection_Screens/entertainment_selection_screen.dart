@@ -68,6 +68,7 @@ class EntertainmentSelectionScreenState
       await _eventService.updateEvent(widget.eventId, {
         'entertainment': entertainment.id,
       });
+
       setState(() {
         eventData?['entertainment'] = entertainment.id;
       });
@@ -81,7 +82,11 @@ class EntertainmentSelectionScreenState
 
   Future<void> _cancelEntertainment() async {
     try {
-      await _eventService.updateEvent(widget.eventId, {'entertainment': null});
+      final updatedEventData = Map<String, dynamic>.from(eventData!);
+      updatedEventData['entertainment'] = null;
+
+      await _eventService.updateEvent(widget.eventId, updatedEventData);
+
       setState(() {
         eventData!['entertainment'] = null;
       });

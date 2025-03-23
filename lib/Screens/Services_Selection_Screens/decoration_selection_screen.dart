@@ -63,9 +63,11 @@ class DecorationSelectionScreenState extends State<DecorationSelectionScreen> {
     }
 
     try {
-      await _eventService.updateEvent(widget.eventId, {
-        'decoration': decoration.id,
-      });
+      final updatedEventData = Map<String, dynamic>.from(eventData!);
+      updatedEventData['decoration'] = decoration.id;
+
+      await _eventService.updateEvent(widget.eventId, updatedEventData);
+
       setState(() {
         eventData?['decoration'] = decoration.id;
       });
@@ -79,7 +81,11 @@ class DecorationSelectionScreenState extends State<DecorationSelectionScreen> {
 
   Future<void> _cancelDecoration() async {
     try {
-      await _eventService.updateEvent(widget.eventId, {'decoration': null});
+      final updatedEventData = Map<String, dynamic>.from(eventData!);
+      updatedEventData['decoration'] = null;
+
+      await _eventService.updateEvent(widget.eventId, updatedEventData);
+
       setState(() {
         eventData!['decoration'] = null;
       });

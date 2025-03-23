@@ -61,7 +61,9 @@ class MusicSelectionScreenState extends State<MusicSelectionScreen> {
 
     try {
       await _musicService.bookMusic(music.id.toString(), widget.eventId);
+
       await _eventService.updateEvent(widget.eventId, {'music': music.id});
+
       setState(() {
         eventData?['music'] = music.id;
       });
@@ -76,7 +78,9 @@ class MusicSelectionScreenState extends State<MusicSelectionScreen> {
   Future<void> _cancelBooking() async {
     try {
       await _musicService.cancelBooking(eventData!['music'], widget.eventId);
+
       await _eventService.updateEvent(widget.eventId, {'music': null});
+
       setState(() {
         eventData!['music'] = null;
       });
