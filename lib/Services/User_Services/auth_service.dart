@@ -118,13 +118,27 @@ class AuthService {
     log("Logging out user...");
 
     try {
-      await client.post(Uri.parse('$baseUrl/api/user/logout'));
+      final prefs = await SharedPreferences.getInstance();
+      final sessionCookie = prefs.getString('sessionCookie');
+
+      if (sessionCookie != null) {
+        await client.post(
+          Uri.parse('$baseUrl/api/user/logout'),
+          headers: {
+            'Content-Type': 'application/json',
+            'Cookie': sessionCookie,
+          },
+        );
+        log("Logout request sent to server.");
+      } else {
+        log("No session cookie found. Skipping logout.");
+      }
     } catch (error) {
       log("Logout error: $error");
     }
 
     final prefs = await SharedPreferences.getInstance();
-    await prefs.remove('sessionId');
-    log("Session ID removed.");
+    await prefs.remove('sessionCookie');
+    log("Session cookie removed from SharedPreferences.");
   }
 }
