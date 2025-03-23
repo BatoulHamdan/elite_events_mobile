@@ -81,7 +81,7 @@ class ViewAttendeesScreenState extends State<ViewAttendeesScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Elite Events - Attendees')),
+      appBar: AppBar(title: const Text('Attendees')),
       body: Container(
         decoration: const BoxDecoration(
           image: DecorationImage(
