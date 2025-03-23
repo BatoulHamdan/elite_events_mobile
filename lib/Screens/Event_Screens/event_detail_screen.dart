@@ -1,4 +1,5 @@
 import 'package:elite_events_mobile/Screens/Event_Screens/attendees_screen.dart';
+import 'package:elite_events_mobile/Screens/Services_Selection_Screens/music_selection_screen.dart';
 import 'package:elite_events_mobile/Screens/Services_Selection_Screens/venue_selection_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:elite_events_mobile/Services/Event_Services/event_service.dart';
@@ -211,9 +212,17 @@ class EventDetailScreenState extends State<EventDetailScreen> {
                                   ListTile(
                                     leading: const Icon(Icons.music_note),
                                     title: const Text("Choose Music"),
-                                    onTap:
-                                        () =>
-                                            navigateToServiceSelection('music'),
+                                    onTap: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder:
+                                              (context) => MusicSelectionScreen(
+                                                eventId: widget.eventId,
+                                              ),
+                                        ),
+                                      );
+                                    },
                                   ),
                                   ListTile(
                                     leading: const Icon(Icons.place),

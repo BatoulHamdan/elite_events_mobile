@@ -1,22 +1,22 @@
-import 'package:elite_events_mobile/Models/Services_Models/venue_model.dart';
-import 'package:elite_events_mobile/Services/Event_Services/event_service.dart';
-import 'package:elite_events_mobile/Services/Services_Services/venue_service.dart';
 import 'package:flutter/material.dart';
+import 'package:elite_events_mobile/Models/Services_Models/music_model.dart';
+import 'package:elite_events_mobile/Services/Event_Services/event_service.dart';
+import 'package:elite_events_mobile/Services/Services_Services/music_service.dart';
 
-class VenueSelectionScreen extends StatefulWidget {
+class MusicSelectionScreen extends StatefulWidget {
   final String eventId;
 
-  const VenueSelectionScreen({super.key, required this.eventId});
+  const MusicSelectionScreen({super.key, required this.eventId});
 
   @override
-  VenueSelectionScreenState createState() => VenueSelectionScreenState();
+  MusicSelectionScreenState createState() => MusicSelectionScreenState();
 }
 
-class VenueSelectionScreenState extends State<VenueSelectionScreen> {
+class MusicSelectionScreenState extends State<MusicSelectionScreen> {
   final EventService _eventService = EventService();
-  final VenueService _venueService = VenueService();
+  final MusicService _musicService = MusicService();
   Map<String, dynamic>? eventData;
-  List<Venue> venueList = [];
+  List<Music> musicList = [];
   bool isLoading = true;
   String errorMessage = '';
 
@@ -35,10 +35,10 @@ class VenueSelectionScreenState extends State<VenueSelectionScreen> {
         throw Exception(event['error']);
       }
 
-      final venues = await _venueService.getVenues();
+      final musicServices = await _musicService.getMusic();
       setState(() {
         eventData = event;
-        venueList = venues;
+        musicList = musicServices;
         isLoading = false;
       });
     } catch (e) {
@@ -49,21 +49,21 @@ class VenueSelectionScreenState extends State<VenueSelectionScreen> {
     }
   }
 
-  Future<void> _bookVenue(Venue venue) async {
-    if (eventData?['venue'] != null) {
+  Future<void> _bookMusic(Music music) async {
+    if (eventData?['music'] != null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text("You have already booked a venue. Cancel it first."),
+          content: Text("You have already booked music. Cancel it first."),
         ),
       );
       return;
     }
 
     try {
-      await _venueService.bookVenue(venue.id.toString(), widget.eventId);
-      await _eventService.updateEvent(widget.eventId, {'venue': venue.id});
+      await _musicService.bookMusic(music.id.toString(), widget.eventId);
+      await _eventService.updateEvent(widget.eventId, {'music': music.id});
       setState(() {
-        eventData?['venue'] = venue.id;
+        eventData?['music'] = music.id;
       });
     } catch (e) {
       if (!mounted) return;
@@ -75,10 +75,10 @@ class VenueSelectionScreenState extends State<VenueSelectionScreen> {
 
   Future<void> _cancelBooking() async {
     try {
-      await _venueService.cancelBooking(eventData!['venue'], widget.eventId);
-      await _eventService.updateEvent(widget.eventId, {'venue': null});
+      await _musicService.cancelBooking(eventData!['music'], widget.eventId);
+      await _eventService.updateEvent(widget.eventId, {'music': null});
       setState(() {
-        eventData!['venue'] = null;
+        eventData!['music'] = null;
       });
     } catch (e) {
       if (!mounted) return;
@@ -88,14 +88,14 @@ class VenueSelectionScreenState extends State<VenueSelectionScreen> {
     }
   }
 
-  bool checkAvailability(Venue venue) {
+  bool checkAvailability(Music music) {
     if (eventData == null || !eventData!.containsKey('date')) {
       return false;
     }
 
     DateTime eventDate = DateTime.parse(eventData!['date']);
 
-    return !venue.unavailableDates.any(
+    return !music.unavailableDates.any(
       (unavailableDate) =>
           unavailableDate.year == eventDate.year &&
           unavailableDate.month == eventDate.month &&
@@ -106,7 +106,7 @@ class VenueSelectionScreenState extends State<VenueSelectionScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(eventData?['name'] ?? "Venue Selection")),
+      appBar: AppBar(title: Text(eventData?['name'] ?? "Music Selection")),
       body: Container(
         decoration: const BoxDecoration(
           image: DecorationImage(
@@ -124,22 +124,22 @@ class VenueSelectionScreenState extends State<VenueSelectionScreen> {
                     style: const TextStyle(color: Colors.red),
                   ),
                 )
-                : venueList.isEmpty
+                : musicList.isEmpty
                 ? const Center(
-                  child: Text("No venues found. Pull down to refresh."),
+                  child: Text("No music services found. Pull down to refresh."),
                 )
                 : RefreshIndicator(
-                  onRefresh: () async => _fetchEventData(),
+                  onRefresh: _fetchEventData,
                   child: ListView.builder(
                     padding: const EdgeInsets.all(16.0),
-                    itemCount: venueList.length,
+                    itemCount: musicList.length,
                     itemBuilder: (context, index) {
-                      final venue = venueList[index];
-                      bool isAvailable = checkAvailability(venue);
-                      bool isBooked = eventData?['venue'] == venue.id;
-                      bool anotherVenueBooked =
-                          eventData?['venue'] != null &&
-                          eventData?['venue'] != venue.id;
+                      final music = musicList[index];
+                      bool isBooked = eventData?['music'] == music.id;
+                      bool anotherMusicBooked =
+                          eventData?['music'] != null &&
+                          eventData?['music'] != music.id;
+                      bool isAvailable = checkAvailability(music);
 
                       return Card(
                         shape: RoundedRectangleBorder(
@@ -149,27 +149,18 @@ class VenueSelectionScreenState extends State<VenueSelectionScreen> {
                         child: ListTile(
                           contentPadding: const EdgeInsets.all(15),
                           title: Text(
-                            venue.name,
+                            music.name,
                             style: const TextStyle(fontWeight: FontWeight.bold),
                           ),
                           subtitle: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text('Location: ${venue.location}'),
-                              Text('Capacity: ${venue.capacity} people'),
+                              Text(music.type),
                               Text(
-                                'Price: \$${venue.price.toStringAsFixed(2)}',
+                                'Price: \$${music.price.toStringAsFixed(2)}',
                               ),
                               const SizedBox(height: 10),
-                              if (isBooked)
-                                ElevatedButton(
-                                  onPressed: _cancelBooking,
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: Colors.red,
-                                  ),
-                                  child: const Text("Cancel Booking"),
-                                )
-                              else if (!isAvailable)
+                              if (!isAvailable)
                                 const Text(
                                   "Not available on this date",
                                   style: TextStyle(
@@ -177,9 +168,17 @@ class VenueSelectionScreenState extends State<VenueSelectionScreen> {
                                     fontWeight: FontWeight.bold,
                                   ),
                                 )
-                              else if (!anotherVenueBooked)
+                              else if (isBooked)
                                 ElevatedButton(
-                                  onPressed: () => _bookVenue(venue),
+                                  onPressed: _cancelBooking,
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: Colors.red,
+                                  ),
+                                  child: const Text("Cancel Booking"),
+                                )
+                              else if (!anotherMusicBooked)
+                                ElevatedButton(
+                                  onPressed: () => _bookMusic(music),
                                   child: const Text("Book"),
                                 )
                               else
@@ -187,17 +186,17 @@ class VenueSelectionScreenState extends State<VenueSelectionScreen> {
                             ],
                           ),
                           leading:
-                              (venue.images.isNotEmpty)
+                              music.images.isNotEmpty
                                   ? ClipRRect(
                                     borderRadius: BorderRadius.circular(8),
                                     child: Image.network(
-                                      'http://10.0.2.2:5000/api/user/service/images/${venue.images[0]}',
+                                      'http://10.0.2.2:5000/api/user/service/images/${music.images[0]}',
                                       fit: BoxFit.cover,
                                       width: 60,
                                       height: 60,
                                     ),
                                   )
-                                  : const Icon(Icons.location_city, size: 60),
+                                  : const Icon(Icons.music_note, size: 60),
                         ),
                       );
                     },

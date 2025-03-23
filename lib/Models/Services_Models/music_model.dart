@@ -6,6 +6,7 @@ class Music {
   final String type;
   final double price;
   final List<String> images;
+  List<DateTime> unavailableDates;
 
   Music({
     required this.id,
@@ -13,6 +14,7 @@ class Music {
     required this.type,
     required this.price,
     required this.images,
+    required this.unavailableDates,
   });
 
   // Factory method to create an instance from JSON
@@ -23,6 +25,10 @@ class Music {
       type: json['type'] ?? '',
       price: (json['price'] ?? 0).toDouble(),
       images: List<String>.from(json['images'] ?? []),
+      unavailableDates:
+          (json['unavailableDates'] as List? ?? [])
+              .map((date) => DateTime.parse(date))
+              .toList(),
     );
   }
 
@@ -34,6 +40,8 @@ class Music {
       'type': type,
       'price': price,
       'images': images,
+      'unavailableDates':
+          unavailableDates.map((date) => date.toIso8601String()).toList(),
     };
   }
 
