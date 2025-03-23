@@ -1,4 +1,5 @@
 import 'package:elite_events_mobile/Screens/Event_Screens/attendees_screen.dart';
+import 'package:elite_events_mobile/Screens/Services_Selection_Screens/catering_selection_screen.dart';
 import 'package:elite_events_mobile/Screens/Services_Selection_Screens/music_selection_screen.dart';
 import 'package:elite_events_mobile/Screens/Services_Selection_Screens/venue_selection_screen.dart';
 import 'package:flutter/material.dart';
@@ -254,7 +255,18 @@ class EventDetailScreenState extends State<EventDetailScreen> {
                                   ListTile(
                                     leading: const Icon(Icons.restaurant),
                                     title: const Text("Choose Catering"),
-                                    onTap: () => '',
+                                    onTap: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder:
+                                              (context) =>
+                                                  CateringSelectionScreen(
+                                                    eventId: widget.eventId,
+                                                  ),
+                                        ),
+                                      );
+                                    },
                                   ),
                                   ListTile(
                                     leading: const Icon(Icons.palette),

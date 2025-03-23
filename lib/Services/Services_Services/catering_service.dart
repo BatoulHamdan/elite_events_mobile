@@ -42,30 +42,4 @@ class CateringService {
       rethrow;
     }
   }
-
-  // Book a catering service for an event
-  Future<void> bookCatering(String cateringId, String eventId) async {
-    try {
-      final headers = await _getAuthHeaders();
-      await _apiService.putData('catering/$cateringId/book', {
-        'eventId': eventId,
-      }, headers: headers);
-    } catch (e) {
-      rethrow;
-    }
-  }
-
-  // Cancel catering service booking
-  Future<void> cancelCatering(String cateringId, String eventId) async {
-    try {
-      final headers = await _getAuthHeaders();
-      await _apiService.deleteData(
-        'catering/$cateringId/cancel',
-        headers: headers,
-        body: {'eventId': eventId}, 
-      );
-    } catch (e) {
-      rethrow;
-    }
-  }
 }

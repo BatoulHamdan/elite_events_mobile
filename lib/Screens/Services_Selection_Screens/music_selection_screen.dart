@@ -174,7 +174,7 @@ class MusicSelectionScreenState extends State<MusicSelectionScreen> {
                                   style: ElevatedButton.styleFrom(
                                     backgroundColor: Colors.red,
                                   ),
-                                  child: const Text("Cancel Booking"),
+                                  child: const Text("Cancel"),
                                 )
                               else if (!anotherMusicBooked)
                                 ElevatedButton(

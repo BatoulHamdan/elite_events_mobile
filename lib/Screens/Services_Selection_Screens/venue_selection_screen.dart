@@ -167,7 +167,7 @@ class VenueSelectionScreenState extends State<VenueSelectionScreen> {
                                   style: ElevatedButton.styleFrom(
                                     backgroundColor: Colors.red,
                                   ),
-                                  child: const Text("Cancel Booking"),
+                                  child: const Text("Cancel"),
                                 )
                               else if (!isAvailable)
                                 const Text(
