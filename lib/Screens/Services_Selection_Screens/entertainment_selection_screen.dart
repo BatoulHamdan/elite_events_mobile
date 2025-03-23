@@ -1,22 +1,24 @@
 import 'package:flutter/material.dart';
-import 'package:elite_events_mobile/Models/Services_Models/catering_model.dart';
+import 'package:elite_events_mobile/Models/Services_Models/entertainment_model.dart';
+import 'package:elite_events_mobile/Services/Services_Services/entertainment_service.dart';
 import 'package:elite_events_mobile/Services/Event_Services/event_service.dart';
-import 'package:elite_events_mobile/Services/Services_Services/catering_service.dart';
 
-class CateringSelectionScreen extends StatefulWidget {
+class EntertainmentSelectionScreen extends StatefulWidget {
   final String eventId;
 
-  const CateringSelectionScreen({super.key, required this.eventId});
+  const EntertainmentSelectionScreen({super.key, required this.eventId});
 
   @override
-  CateringSelectionScreenState createState() => CateringSelectionScreenState();
+  EntertainmentSelectionScreenState createState() =>
+      EntertainmentSelectionScreenState();
 }
 
-class CateringSelectionScreenState extends State<CateringSelectionScreen> {
+class EntertainmentSelectionScreenState
+    extends State<EntertainmentSelectionScreen> {
   final EventService _eventService = EventService();
-  final CateringService _cateringService = CateringService();
+  final EntertainmentService _entertainmentService = EntertainmentService();
   Map<String, dynamic>? eventData;
-  List<Catering> cateringList = [];
+  List<Entertainment> entertainmentList = [];
   bool isLoading = true;
   String errorMessage = '';
 
@@ -35,10 +37,11 @@ class CateringSelectionScreenState extends State<CateringSelectionScreen> {
         throw Exception(event['error']);
       }
 
-      final cateringServices = await _cateringService.getCaterings();
+      final entertainmentServices =
+          await _entertainmentService.getEntertainments();
       setState(() {
         eventData = event;
-        cateringList = cateringServices;
+        entertainmentList = entertainmentServices;
         isLoading = false;
       });
     } catch (e) {
@@ -49,11 +52,13 @@ class CateringSelectionScreenState extends State<CateringSelectionScreen> {
     }
   }
 
-  Future<void> _bookCatering(Catering catering) async {
-    if (eventData?['catering'] != null) {
+  Future<void> _bookEntertainment(Entertainment entertainment) async {
+    if (eventData?['entertainment'] != null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text("You have already booked catering. Cancel it first."),
+          content: Text(
+            "You have already booked entertainment. Cancel it first.",
+          ),
         ),
       );
       return;
@@ -61,10 +66,10 @@ class CateringSelectionScreenState extends State<CateringSelectionScreen> {
 
     try {
       await _eventService.updateEvent(widget.eventId, {
-        'catering': catering.id,
+        'entertainment': entertainment.id,
       });
       setState(() {
-        eventData?['catering'] = catering.id;
+        eventData?['entertainment'] = entertainment.id;
       });
     } catch (e) {
       if (!mounted) return;
@@ -74,11 +79,11 @@ class CateringSelectionScreenState extends State<CateringSelectionScreen> {
     }
   }
 
-  Future<void> _cancelCatering() async {
+  Future<void> _cancelEntertainment() async {
     try {
-      await _eventService.updateEvent(widget.eventId, {'catering': null});
+      await _eventService.updateEvent(widget.eventId, {'entertainment': null});
       setState(() {
-        eventData!['catering'] = null;
+        eventData!['entertainment'] = null;
       });
     } catch (e) {
       if (!mounted) return;
@@ -109,23 +114,24 @@ class CateringSelectionScreenState extends State<CateringSelectionScreen> {
                     style: const TextStyle(color: Colors.red),
                   ),
                 )
-                : cateringList.isEmpty
+                : entertainmentList.isEmpty
                 ? const Center(
                   child: Text(
-                    "No catering services found. Pull down to refresh.",
+                    "No entertainment services found. Pull down to refresh.",
                   ),
                 )
                 : RefreshIndicator(
                   onRefresh: _fetchEventData,
                   child: ListView.builder(
                     padding: const EdgeInsets.all(16.0),
-                    itemCount: cateringList.length,
+                    itemCount: entertainmentList.length,
                     itemBuilder: (context, index) {
-                      final catering = cateringList[index];
-                      bool isBooked = eventData?['catering'] == catering.id;
-                      bool anotherCateringBooked =
-                          eventData?['catering'] != null &&
-                          eventData?['catering'] != catering.id;
+                      final entertainment = entertainmentList[index];
+                      bool isBooked =
+                          eventData?['entertainment'] == entertainment.id;
+                      bool anotherEntertainmentBooked =
+                          eventData?['entertainment'] != null &&
+                          eventData?['entertainment'] != entertainment.id;
 
                       return Card(
                         shape: RoundedRectangleBorder(
@@ -135,33 +141,28 @@ class CateringSelectionScreenState extends State<CateringSelectionScreen> {
                         child: ListTile(
                           contentPadding: const EdgeInsets.all(15),
                           title: Text(
-                            catering.restaurantName,
+                            entertainment.name,
                             style: const TextStyle(fontWeight: FontWeight.bold),
                           ),
                           subtitle: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                'Food Menu: ${catering.foodMenu.length} items',
-                              ),
-                              Text(
-                                'Drink Menu: ${catering.drinkMenu.length} items',
-                              ),
-                              Text(
-                                'Dessert Menu: ${catering.dessertMenu.length} items',
+                                'Price: \$${entertainment.price.toStringAsFixed(2)}',
                               ),
                               const SizedBox(height: 10),
                               if (isBooked)
                                 ElevatedButton(
-                                  onPressed: _cancelCatering,
+                                  onPressed: _cancelEntertainment,
                                   style: ElevatedButton.styleFrom(
                                     backgroundColor: Colors.red,
                                   ),
                                   child: const Text("Cancel"),
                                 )
-                              else if (!anotherCateringBooked)
+                              else if (!anotherEntertainmentBooked)
                                 ElevatedButton(
-                                  onPressed: () => _bookCatering(catering),
+                                  onPressed:
+                                      () => _bookEntertainment(entertainment),
                                   child: const Text("Book"),
                                 )
                               else
@@ -169,17 +170,17 @@ class CateringSelectionScreenState extends State<CateringSelectionScreen> {
                             ],
                           ),
                           leading:
-                              catering.images.isNotEmpty
+                              entertainment.images.isNotEmpty
                                   ? ClipRRect(
                                     borderRadius: BorderRadius.circular(8),
                                     child: Image.network(
-                                      'http://10.0.2.2:5000/api/user/service/images/${catering.images[0]}',
+                                      'http://10.0.2.2:5000/api/user/service/images/${entertainment.images[0]}',
                                       fit: BoxFit.cover,
                                       width: 60,
                                       height: 60,
                                     ),
                                   )
-                                  : const Icon(Icons.restaurant, size: 60),
+                                  : const Icon(Icons.music_note, size: 60),
                         ),
                       );
                     },

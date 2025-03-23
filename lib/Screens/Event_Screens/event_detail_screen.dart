@@ -1,5 +1,7 @@
 import 'package:elite_events_mobile/Screens/Event_Screens/attendees_screen.dart';
 import 'package:elite_events_mobile/Screens/Services_Selection_Screens/catering_selection_screen.dart';
+import 'package:elite_events_mobile/Screens/Services_Selection_Screens/decoration_selection_screen.dart';
+import 'package:elite_events_mobile/Screens/Services_Selection_Screens/entertainment_selection_screen.dart';
 import 'package:elite_events_mobile/Screens/Services_Selection_Screens/music_selection_screen.dart';
 import 'package:elite_events_mobile/Screens/Services_Selection_Screens/venue_selection_screen.dart';
 import 'package:flutter/material.dart';
@@ -229,18 +231,6 @@ class EventDetailScreenState extends State<EventDetailScreen> {
                                     leading: const Icon(Icons.place),
                                     title: const Text("Choose Venue"),
                                     onTap: () {
-                                      if (_dateController.text.isEmpty) {
-                                        ScaffoldMessenger.of(
-                                          context,
-                                        ).showSnackBar(
-                                          const SnackBar(
-                                            content: Text(
-                                              'Please enter a valid date before choosing a venue.',
-                                            ),
-                                          ),
-                                        );
-                                        return;
-                                      }
                                       Navigator.push(
                                         context,
                                         MaterialPageRoute(
@@ -271,12 +261,34 @@ class EventDetailScreenState extends State<EventDetailScreen> {
                                   ListTile(
                                     leading: const Icon(Icons.palette),
                                     title: const Text("Choose Decorations"),
-                                    onTap: () => '',
+                                    onTap: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder:
+                                              (context) =>
+                                                  DecorationSelectionScreen(
+                                                    eventId: widget.eventId,
+                                                  ),
+                                        ),
+                                      );
+                                    },
                                   ),
                                   ListTile(
                                     leading: const Icon(Icons.celebration),
                                     title: const Text("Choose Entertainment"),
-                                    onTap: () => '',
+                                    onTap: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder:
+                                              (context) =>
+                                                  EntertainmentSelectionScreen(
+                                                    eventId: widget.eventId,
+                                                  ),
+                                        ),
+                                      );
+                                    },
                                   ),
 
                                   const SizedBox(height: 20),

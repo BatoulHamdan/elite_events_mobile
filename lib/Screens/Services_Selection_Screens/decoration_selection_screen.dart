@@ -1,22 +1,23 @@
 import 'package:flutter/material.dart';
-import 'package:elite_events_mobile/Models/Services_Models/catering_model.dart';
+import 'package:elite_events_mobile/Models/Services_Models/decoration_model.dart';
+import 'package:elite_events_mobile/Services/Services_Services/decoration_service.dart';
 import 'package:elite_events_mobile/Services/Event_Services/event_service.dart';
-import 'package:elite_events_mobile/Services/Services_Services/catering_service.dart';
 
-class CateringSelectionScreen extends StatefulWidget {
+class DecorationSelectionScreen extends StatefulWidget {
   final String eventId;
 
-  const CateringSelectionScreen({super.key, required this.eventId});
+  const DecorationSelectionScreen({super.key, required this.eventId});
 
   @override
-  CateringSelectionScreenState createState() => CateringSelectionScreenState();
+  DecorationSelectionScreenState createState() =>
+      DecorationSelectionScreenState();
 }
 
-class CateringSelectionScreenState extends State<CateringSelectionScreen> {
+class DecorationSelectionScreenState extends State<DecorationSelectionScreen> {
   final EventService _eventService = EventService();
-  final CateringService _cateringService = CateringService();
+  final DecorationService _decorationService = DecorationService();
   Map<String, dynamic>? eventData;
-  List<Catering> cateringList = [];
+  List<Decorationn> decorationList = [];
   bool isLoading = true;
   String errorMessage = '';
 
@@ -35,10 +36,10 @@ class CateringSelectionScreenState extends State<CateringSelectionScreen> {
         throw Exception(event['error']);
       }
 
-      final cateringServices = await _cateringService.getCaterings();
+      final decorationServices = await _decorationService.getDecorations();
       setState(() {
         eventData = event;
-        cateringList = cateringServices;
+        decorationList = decorationServices;
         isLoading = false;
       });
     } catch (e) {
@@ -49,11 +50,13 @@ class CateringSelectionScreenState extends State<CateringSelectionScreen> {
     }
   }
 
-  Future<void> _bookCatering(Catering catering) async {
-    if (eventData?['catering'] != null) {
+  Future<void> _bookDecoration(Decorationn decoration) async {
+    if (eventData?['decoration'] != null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text("You have already booked catering. Cancel it first."),
+          content: Text(
+            "You have already booked a decoration. Cancel it first.",
+          ),
         ),
       );
       return;
@@ -61,10 +64,10 @@ class CateringSelectionScreenState extends State<CateringSelectionScreen> {
 
     try {
       await _eventService.updateEvent(widget.eventId, {
-        'catering': catering.id,
+        'decoration': decoration.id,
       });
       setState(() {
-        eventData?['catering'] = catering.id;
+        eventData?['decoration'] = decoration.id;
       });
     } catch (e) {
       if (!mounted) return;
@@ -74,11 +77,11 @@ class CateringSelectionScreenState extends State<CateringSelectionScreen> {
     }
   }
 
-  Future<void> _cancelCatering() async {
+  Future<void> _cancelDecoration() async {
     try {
-      await _eventService.updateEvent(widget.eventId, {'catering': null});
+      await _eventService.updateEvent(widget.eventId, {'decoration': null});
       setState(() {
-        eventData!['catering'] = null;
+        eventData!['decoration'] = null;
       });
     } catch (e) {
       if (!mounted) return;
@@ -109,23 +112,23 @@ class CateringSelectionScreenState extends State<CateringSelectionScreen> {
                     style: const TextStyle(color: Colors.red),
                   ),
                 )
-                : cateringList.isEmpty
+                : decorationList.isEmpty
                 ? const Center(
                   child: Text(
-                    "No catering services found. Pull down to refresh.",
+                    "No decoration services found. Pull down to refresh.",
                   ),
                 )
                 : RefreshIndicator(
                   onRefresh: _fetchEventData,
                   child: ListView.builder(
                     padding: const EdgeInsets.all(16.0),
-                    itemCount: cateringList.length,
+                    itemCount: decorationList.length,
                     itemBuilder: (context, index) {
-                      final catering = cateringList[index];
-                      bool isBooked = eventData?['catering'] == catering.id;
-                      bool anotherCateringBooked =
-                          eventData?['catering'] != null &&
-                          eventData?['catering'] != catering.id;
+                      final decoration = decorationList[index];
+                      bool isBooked = eventData?['decoration'] == decoration.id;
+                      bool anotherDecorationBooked =
+                          eventData?['decoration'] != null &&
+                          eventData?['decoration'] != decoration.id;
 
                       return Card(
                         shape: RoundedRectangleBorder(
@@ -135,33 +138,28 @@ class CateringSelectionScreenState extends State<CateringSelectionScreen> {
                         child: ListTile(
                           contentPadding: const EdgeInsets.all(15),
                           title: Text(
-                            catering.restaurantName,
+                            decoration.name,
                             style: const TextStyle(fontWeight: FontWeight.bold),
                           ),
                           subtitle: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
+                              Text('Type: ${decoration.type}'),
                               Text(
-                                'Food Menu: ${catering.foodMenu.length} items',
-                              ),
-                              Text(
-                                'Drink Menu: ${catering.drinkMenu.length} items',
-                              ),
-                              Text(
-                                'Dessert Menu: ${catering.dessertMenu.length} items',
+                                'Price: \$${decoration.price.toStringAsFixed(2)}',
                               ),
                               const SizedBox(height: 10),
                               if (isBooked)
                                 ElevatedButton(
-                                  onPressed: _cancelCatering,
+                                  onPressed: _cancelDecoration,
                                   style: ElevatedButton.styleFrom(
                                     backgroundColor: Colors.red,
                                   ),
                                   child: const Text("Cancel"),
                                 )
-                              else if (!anotherCateringBooked)
+                              else if (!anotherDecorationBooked)
                                 ElevatedButton(
-                                  onPressed: () => _bookCatering(catering),
+                                  onPressed: () => _bookDecoration(decoration),
                                   child: const Text("Book"),
                                 )
                               else
@@ -169,17 +167,17 @@ class CateringSelectionScreenState extends State<CateringSelectionScreen> {
                             ],
                           ),
                           leading:
-                              catering.images.isNotEmpty
+                              decoration.images.isNotEmpty
                                   ? ClipRRect(
                                     borderRadius: BorderRadius.circular(8),
                                     child: Image.network(
-                                      'http://10.0.2.2:5000/api/user/service/images/${catering.images[0]}',
+                                      'http://10.0.2.2:5000/api/user/service/images/${decoration.images[0]}',
                                       fit: BoxFit.cover,
                                       width: 60,
                                       height: 60,
                                     ),
                                   )
-                                  : const Icon(Icons.restaurant, size: 60),
+                                  : const Icon(Icons.light, size: 60),
                         ),
                       );
                     },
