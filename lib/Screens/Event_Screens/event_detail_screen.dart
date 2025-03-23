@@ -1,11 +1,11 @@
-import 'package:elite_events_mobile/Screens/Event_Screens/attendees_screen.dart';
+import 'package:flutter/material.dart';
+import 'package:elite_events_mobile/Services/Event_Services/event_service.dart';
 import 'package:elite_events_mobile/Screens/Services_Selection_Screens/catering_selection_screen.dart';
 import 'package:elite_events_mobile/Screens/Services_Selection_Screens/decoration_selection_screen.dart';
 import 'package:elite_events_mobile/Screens/Services_Selection_Screens/entertainment_selection_screen.dart';
 import 'package:elite_events_mobile/Screens/Services_Selection_Screens/music_selection_screen.dart';
 import 'package:elite_events_mobile/Screens/Services_Selection_Screens/venue_selection_screen.dart';
-import 'package:flutter/material.dart';
-import 'package:elite_events_mobile/Services/Event_Services/event_service.dart';
+import 'package:elite_events_mobile/Screens/Event_Screens/attendees_screen.dart';
 
 class EventDetailScreen extends StatefulWidget {
   final String eventId;
@@ -66,16 +66,45 @@ class EventDetailScreenState extends State<EventDetailScreen> {
       'description': _descriptionController.text,
     };
 
-    final response = await eventService.updateEvent(
-      widget.eventId,
-      updatedData,
-    );
-    setState(() => isLoading = false);
+    final response = await eventService.fetchEventDetail(widget.eventId);
+    final event = response['data']['event'];
 
-    if (response.containsKey('error')) {
-      setState(() => error = response['error']);
-    } else {
-      setState(() => isEditing = false);
+    if (event?['decoration'] != null) {
+      updatedData['decoration'] = event?['decoration'];
+    }
+    if (event?['catering'] != null) {
+      updatedData['catering'] = event?['catering'];
+    }
+    if (event?['music'] != null) {
+      updatedData['music'] = event?['music'];
+    }
+    if (event?['entertainment'] != null) {
+      updatedData['entertainment'] = event?['entertainment'];
+    }
+    if (event?['venue'] != null) {
+      updatedData['venue'] = event?['venue'];
+    }
+
+    try {
+      final response = await eventService.updateEvent(
+        widget.eventId,
+        updatedData,
+      );
+
+      setState(() => isLoading = false);
+
+      if (response.containsKey('error')) {
+        setState(() => error = response['error']);
+      } else {
+        setState(() => isEditing = false);
+      }
+    } catch (e) {
+      if (!mounted) return;
+      setState(() => isLoading = false);
+
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text("Error: $e")));
     }
   }
 
@@ -187,114 +216,116 @@ class EventDetailScreenState extends State<EventDetailScreen> {
                                   ),
                                   const SizedBox(height: 20),
 
-                                  // View Attendees Section
-                                  const Divider(),
-                                  ListTile(
-                                    leading: const Icon(Icons.people),
-                                    title: const Text("View Attendees"),
-                                    onTap: () {
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder:
-                                              (context) => ViewAttendeesScreen(
-                                                eventId: widget.eventId,
-                                              ),
-                                        ),
-                                      );
-                                    },
-                                  ),
-
-                                  const SizedBox(height: 20),
-
-                                  // Service Selection Section
-                                  const Divider(),
-                                  const Text(
-                                    'Choose Services:',
-                                    style: TextStyle(
-                                      fontSize: 22,
-                                      fontWeight: FontWeight.bold,
+                                  // Show Attendees and Services only when not editing
+                                  if (!isEditing) ...[
+                                    const Divider(),
+                                    ListTile(
+                                      leading: const Icon(Icons.people),
+                                      title: const Text("View Attendees"),
+                                      onTap: () {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder:
+                                                (context) =>
+                                                    ViewAttendeesScreen(
+                                                      eventId: widget.eventId,
+                                                    ),
+                                          ),
+                                        );
+                                      },
                                     ),
-                                  ),
-                                  const SizedBox(height: 10),
-                                  ListTile(
-                                    leading: const Icon(Icons.music_note),
-                                    title: const Text("Choose Music"),
-                                    onTap: () {
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder:
-                                              (context) => MusicSelectionScreen(
-                                                eventId: widget.eventId,
-                                              ),
-                                        ),
-                                      );
-                                    },
-                                  ),
-                                  ListTile(
-                                    leading: const Icon(Icons.place),
-                                    title: const Text("Choose Venue"),
-                                    onTap: () {
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder:
-                                              (context) => VenueSelectionScreen(
-                                                eventId: widget.eventId,
-                                              ),
-                                        ),
-                                      );
-                                    },
-                                  ),
-                                  ListTile(
-                                    leading: const Icon(Icons.restaurant),
-                                    title: const Text("Choose Catering"),
-                                    onTap: () {
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder:
-                                              (context) =>
-                                                  CateringSelectionScreen(
-                                                    eventId: widget.eventId,
-                                                  ),
-                                        ),
-                                      );
-                                    },
-                                  ),
-                                  ListTile(
-                                    leading: const Icon(Icons.palette),
-                                    title: const Text("Choose Decorations"),
-                                    onTap: () {
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder:
-                                              (context) =>
-                                                  DecorationSelectionScreen(
-                                                    eventId: widget.eventId,
-                                                  ),
-                                        ),
-                                      );
-                                    },
-                                  ),
-                                  ListTile(
-                                    leading: const Icon(Icons.celebration),
-                                    title: const Text("Choose Entertainment"),
-                                    onTap: () {
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder:
-                                              (context) =>
-                                                  EntertainmentSelectionScreen(
-                                                    eventId: widget.eventId,
-                                                  ),
-                                        ),
-                                      );
-                                    },
-                                  ),
+                                    const SizedBox(height: 20),
+                                    const Divider(),
+                                    const Text(
+                                      'Choose Services:',
+                                      style: TextStyle(
+                                        fontSize: 22,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 10),
+                                    ListTile(
+                                      leading: const Icon(Icons.music_note),
+                                      title: const Text("Choose Music"),
+                                      onTap: () {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder:
+                                                (context) =>
+                                                    MusicSelectionScreen(
+                                                      eventId: widget.eventId,
+                                                    ),
+                                          ),
+                                        );
+                                      },
+                                    ),
+                                    ListTile(
+                                      leading: const Icon(Icons.place),
+                                      title: const Text("Choose Venue"),
+                                      onTap: () {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder:
+                                                (context) =>
+                                                    VenueSelectionScreen(
+                                                      eventId: widget.eventId,
+                                                    ),
+                                          ),
+                                        );
+                                      },
+                                    ),
+                                    ListTile(
+                                      leading: const Icon(Icons.restaurant),
+                                      title: const Text("Choose Catering"),
+                                      onTap: () {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder:
+                                                (context) =>
+                                                    CateringSelectionScreen(
+                                                      eventId: widget.eventId,
+                                                    ),
+                                          ),
+                                        );
+                                      },
+                                    ),
+                                    ListTile(
+                                      leading: const Icon(Icons.palette),
+                                      title: const Text("Choose Decorations"),
+                                      onTap: () {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder:
+                                                (context) =>
+                                                    DecorationSelectionScreen(
+                                                      eventId: widget.eventId,
+                                                    ),
+                                          ),
+                                        );
+                                      },
+                                    ),
+                                    ListTile(
+                                      leading: const Icon(Icons.celebration),
+                                      title: const Text("Choose Entertainment"),
+                                      onTap: () {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder:
+                                                (context) =>
+                                                    EntertainmentSelectionScreen(
+                                                      eventId: widget.eventId,
+                                                    ),
+                                          ),
+                                        );
+                                      },
+                                    ),
+                                  ],
 
                                   const SizedBox(height: 20),
                                   if (isEditing)
