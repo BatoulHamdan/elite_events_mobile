@@ -50,7 +50,7 @@ class NavbarState extends State<Navbar> {
           MaterialPageRoute(builder: (context) => const ProfileScreen()),
         );
         break;
-      case 'My Events':
+      case 'Events':
         if (!mounted) return;
         Navigator.push(
           context,
@@ -93,8 +93,8 @@ class NavbarState extends State<Navbar> {
                       child: Text('Profile'),
                     ),
                     const PopupMenuItem<String>(
-                      value: 'My Events',
-                      child: Text('My Events'),
+                      value: 'Events',
+                      child: Text('Events'),
                     ),
                     const PopupMenuItem<String>(
                       value: 'Logout',

@@ -106,7 +106,7 @@ class MusicSelectionScreenState extends State<MusicSelectionScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(eventData?['name'] ?? "Music Selection")),
+      appBar: AppBar(title: Text("Music Selection")),
       body: Container(
         decoration: const BoxDecoration(
           image: DecorationImage(

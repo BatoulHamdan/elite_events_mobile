@@ -62,7 +62,7 @@ class AddEventScreenState extends State<AddEventScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Elite Events')),
+      appBar: AppBar(title: const Text('Add Event')),
       body: SizedBox.expand(
         child: Container(
           decoration: const BoxDecoration(
@@ -89,7 +89,7 @@ class AddEventScreenState extends State<AddEventScreen> {
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           const Text(
-                            'Add Event',
+                            'Event Details',
                             style: TextStyle(
                               fontSize: 28,
                               fontWeight: FontWeight.bold,
@@ -227,9 +227,34 @@ class AddEventScreenState extends State<AddEventScreen> {
                             ),
                           _isLoading
                               ? const CircularProgressIndicator()
-                              : ElevatedButton(
-                                onPressed: _submitForm,
-                                child: const Text('Add Event'),
+                              : SizedBox(
+                                width: double.infinity,
+                                child: ElevatedButton(
+                                  onPressed: _isLoading ? null : _submitForm,
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: Colors.white,
+                                    padding: const EdgeInsets.symmetric(
+                                      vertical: 16,
+                                    ),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(5),
+                                      side: const BorderSide(
+                                        color: Colors.black,
+                                      ),
+                                    ),
+                                  ),
+                                  child:
+                                      _isLoading
+                                          ? const CircularProgressIndicator()
+                                          : const Text(
+                                            'Add Event',
+                                            style: TextStyle(
+                                              color: Colors.black,
+                                              fontSize: 16,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                ),
                               ),
                         ],
                       ),

@@ -91,7 +91,7 @@ class CateringSelectionScreenState extends State<CateringSelectionScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(eventData?['name'] ?? "Music Selection")),
+      appBar: AppBar(title: Text("Catering Selection")),
       body: Container(
         decoration: const BoxDecoration(
           image: DecorationImage(

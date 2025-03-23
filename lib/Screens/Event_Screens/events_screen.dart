@@ -79,7 +79,7 @@ class EventsScreenState extends State<EventsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Elite Events')),
+      appBar: AppBar(title: const Text('Events')),
       body: Container(
         decoration: const BoxDecoration(
           image: DecorationImage(

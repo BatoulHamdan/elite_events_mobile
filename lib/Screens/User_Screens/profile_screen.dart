@@ -66,7 +66,7 @@ class ProfileScreenState extends State<ProfileScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Elite Events'),
+        title: const Text('Profile'),
         actions: [
           IconButton(
             icon: Icon(isEditing ? Icons.cancel : Icons.edit),
@@ -183,11 +183,6 @@ class ProfileScreenState extends State<ProfileScreen> {
                     ),
           ),
         ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () => setState(() => isEditing = !isEditing),
-        backgroundColor: Colors.black,
-        child: Icon(isEditing ? Icons.cancel : Icons.edit),
       ),
     );
   }

@@ -87,7 +87,12 @@ class EventDetailScreenState extends State<EventDetailScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Elite Events'),
+        title: Text(
+          _eventNameController.text.isNotEmpty
+              ? _eventNameController.text
+              : 'Event Details',
+          style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+        ),
         actions: [
           IconButton(
             icon: Icon(isEditing ? Icons.cancel : Icons.edit),

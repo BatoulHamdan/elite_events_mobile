@@ -94,7 +94,7 @@ class DecorationSelectionScreenState extends State<DecorationSelectionScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(eventData?['name'] ?? "Music Selection")),
+      appBar: AppBar(title: Text("Decoration Selection")),
       body: Container(
         decoration: const BoxDecoration(
           image: DecorationImage(
