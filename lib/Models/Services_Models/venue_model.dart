@@ -1,4 +1,5 @@
 class Venue {
+  final String id;
   String name;
   List<String> images;
   String description;
@@ -10,6 +11,7 @@ class Venue {
   String eventType;
 
   Venue({
+    required this.id,
     required this.name,
     required this.images,
     required this.description,
@@ -23,18 +25,19 @@ class Venue {
 
   factory Venue.fromJson(Map<String, dynamic> json) {
     return Venue(
+      id: json['_id'] ?? '',
       name: json['name'],
-      images: List<String>.from(json['images']),
-      description: json['description'],
-      location: json['location'],
-      capacity: json['capacity'],
-      contactInfo: ContactInfo.fromJson(json['contactInfo']),
+      images: (json['images'] != null) ? List<String>.from(json['images']) : [],
+      description: json['description'] ?? '',
+      location: json['location'] ?? '',
+      capacity: json['capacity'] ?? 0,
+      contactInfo: ContactInfo.fromJson(json['contactInfo'] ?? {}),
       price:
           (json['price'] is int)
               ? (json['price'] as int).toDouble()
-              : json['price'] as double,
+              : (json['price'] as double? ?? 0.0),
       unavailableDates:
-          (json['unavailableDates'] as List)
+          (json['unavailableDates'] as List? ?? [])
               .map((date) => DateTime.parse(date))
               .toList(),
       eventType: json['eventType'] ?? 'other',
@@ -43,6 +46,7 @@ class Venue {
 
   Map<String, dynamic> toJson() {
     return {
+      'id': id,
       'name': name,
       'images': images,
       'description': description,

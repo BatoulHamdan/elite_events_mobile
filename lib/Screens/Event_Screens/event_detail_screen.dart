@@ -219,12 +219,25 @@ class EventDetailScreenState extends State<EventDetailScreen> {
                                     leading: const Icon(Icons.place),
                                     title: const Text("Choose Venue"),
                                     onTap: () {
+                                      if (_dateController.text.isEmpty) {
+                                        ScaffoldMessenger.of(
+                                          context,
+                                        ).showSnackBar(
+                                          const SnackBar(
+                                            content: Text(
+                                              'Please enter a valid date before choosing a venue.',
+                                            ),
+                                          ),
+                                        );
+                                        return;
+                                      }
                                       Navigator.push(
                                         context,
                                         MaterialPageRoute(
                                           builder:
-                                              (context) =>
-                                                  VenueSelectionScreen(),
+                                              (context) => VenueSelectionScreen(
+                                                eventId: widget.eventId,
+                                              ),
                                         ),
                                       );
                                     },

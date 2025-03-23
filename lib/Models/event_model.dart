@@ -12,7 +12,7 @@ class Event {
   final String? music;
   final String? entertainment;
   final String? catering;
-  final String? venue;
+  late final String? venue;
   final String? photo;
   final String? decoration;
   final DateTime createdAt;
