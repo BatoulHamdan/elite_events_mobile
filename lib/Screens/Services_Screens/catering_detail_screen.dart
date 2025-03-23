@@ -11,6 +11,7 @@ class CateringDetailScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(title: Text(catering.restaurantName)),
       body: Container(
+        height: double.infinity,
         decoration: const BoxDecoration(
           image: DecorationImage(
             image: AssetImage("assets/title.jpg"),

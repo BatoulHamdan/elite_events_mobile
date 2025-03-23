@@ -1,5 +1,5 @@
-import 'package:elite_events_mobile/Models/attendee_model.dart';
 import 'package:flutter/material.dart';
+import 'package:elite_events_mobile/Models/attendee_model.dart';
 import 'package:elite_events_mobile/Services/Event_Services/attendee_service.dart';
 
 class AddAttendeeScreen extends StatefulWidget {
@@ -12,15 +12,19 @@ class AddAttendeeScreen extends StatefulWidget {
 }
 
 class AddAttendeeScreenState extends State<AddAttendeeScreen> {
+  final _formKey = GlobalKey<FormState>();
   final TextEditingController fullNameController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
   final AttendeeService attendeeService = AttendeeService();
-  String error = '';
   bool isLoading = false;
+  String error = '';
 
-  Future<void> _addAttendee() async {
+  Future<void> _submitForm() async {
+    if (!_formKey.currentState!.validate()) return;
+
     setState(() {
       isLoading = true;
+      error = ''; // Clear previous errors
     });
 
     Attendee attendee = Attendee(
@@ -56,28 +60,115 @@ class AddAttendeeScreenState extends State<AddAttendeeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Add Attendee')),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-            TextField(
-              controller: fullNameController,
-              decoration: const InputDecoration(labelText: 'Full Name'),
+      body: SizedBox.expand(
+        child: Container(
+          decoration: const BoxDecoration(
+            image: DecorationImage(
+              image: AssetImage("assets/title.jpg"),
+              fit: BoxFit.cover,
             ),
-            TextField(
-              controller: emailController,
-              decoration: const InputDecoration(labelText: 'Email'),
-            ),
-            if (error.isNotEmpty)
-              Text(error, style: const TextStyle(color: Colors.red)),
-            const SizedBox(height: 20),
-            isLoading
-                ? const CircularProgressIndicator()
-                : ElevatedButton(
-                  onPressed: _addAttendee,
-                  child: const Text('Add Attendee'),
+          ),
+          child: Center(
+            child: SingleChildScrollView(
+              child: Padding(
+                padding: const EdgeInsets.all(20.0),
+                child: Card(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(15),
+                  ),
+                  elevation: 5,
+                  color: Colors.white,
+                  child: Padding(
+                    padding: const EdgeInsets.all(20.0),
+                    child: Form(
+                      key: _formKey,
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Text(
+                            'Attendee Details',
+                            style: TextStyle(
+                              fontSize: 28,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black,
+                            ),
+                          ),
+                          const SizedBox(height: 20),
+                          TextFormField(
+                            controller: fullNameController,
+                            decoration: const InputDecoration(
+                              labelText: 'Full Name',
+                              prefixIcon: Icon(Icons.person),
+                              border: OutlineInputBorder(),
+                            ),
+                            validator:
+                                (value) =>
+                                    value!.isEmpty
+                                        ? 'Full Name is required'
+                                        : null,
+                          ),
+                          const SizedBox(height: 16),
+                          TextFormField(
+                            controller: emailController,
+                            decoration: const InputDecoration(
+                              labelText: 'Email',
+                              prefixIcon: Icon(Icons.email),
+                              border: OutlineInputBorder(),
+                            ),
+                            validator:
+                                (value) =>
+                                    value!.isEmpty ? 'Email is required' : null,
+                          ),
+                          const SizedBox(height: 16),
+                          if (error.isNotEmpty)
+                            Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Text(
+                                error,
+                                style: const TextStyle(
+                                  color: Colors.red,
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                            ),
+                          const SizedBox(height: 20),
+                          if (isLoading)
+                            const CircularProgressIndicator()
+                          else
+                            SizedBox(
+                              width: double.infinity,
+                              child: ElevatedButton(
+                                onPressed: _submitForm,
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.white,
+                                  padding: const EdgeInsets.symmetric(
+                                    vertical: 16,
+                                  ),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(5),
+                                    side: const BorderSide(color: Colors.black),
+                                  ),
+                                ),
+                                child: const Text(
+                                  'Add Attendee',
+                                  style: TextStyle(
+                                    color: Colors.black,
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ),
+                            ),
+                        ],
+                      ),
+                    ),
+                  ),
                 ),
-          ],
+              ),
+            ),
+          ),
         ),
       ),
     );
